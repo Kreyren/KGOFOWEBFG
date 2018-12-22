@@ -8,7 +8,7 @@
 ## Portage needs this dir
 ## NoxMentor-0.1 needs to be created or S VAR specified
 ##
-# ${S} == SOurce directory?
+# ${S} == Source directory?
 ## Can be set to multiple dirs
 ## Needs to be a dir(?)
 # After each change in an ebuild, the ebuild has to be re-ebuild using 'ebuild $package manifest' command.
@@ -28,3 +28,4 @@
 #KREY: P - NoxMentor-0.1
 #KREY: V - 
 #KREY: PV - 0.1 -> something/something-${PV}
+#KREY: S - ${WORKDIR}/${P}

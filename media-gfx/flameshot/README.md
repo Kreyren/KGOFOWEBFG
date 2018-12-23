@@ -1,41 +1,6 @@
-<div align="center">
-  <p>
-    <h1>
-      <a href="https://github.com/lupoDharkael/flameshot">
-        <img src="https://github.com/lupoDharkael/flameshot/raw/master/img/app/flameshot.svg" alt="Flameshot" />
-      </a>
-      <br />
-      Flameshot
-    </h1>
-    <h4>Powerful yet simple to use screenshot software.</h4>
-  </p>
-  <p>
-    <a href="https://travis-ci.org/lupoDharkael/flameshot">
-      <img src="https://img.shields.io/travis/lupoDharkael/flameshot.svg?style=flat-square&label=gnu/linux" alt="GNU/Linux Build Status" />
-    </a>
-    <a href="https://ci.appveyor.com/project/lupoDharkael/flameshot">
-      <img src="https://img.shields.io/appveyor/ci/lupoDharkael/flameshot.svg?style=flat-square&label=windows" alt="Windows Build Status" />
-    </a>
-    <a href="https://github.com/lupoDharkael/flameshot/releases">
-      <img src="https://img.shields.io/github/release/lupoDharkael/flameshot.svg?style=flat-square" alt="Latest Stable Release" />
-    </a>
-    <a href="https://github.com/lupoDharkael/flameshot/releases">
-      <img src="https://img.shields.io/github/downloads/lupoDharkael/flameshot/total.svg?style=flat-square" alt="Total Downloads" />
-    </a>
-    <a href="https://github.com/lupoDharkael/flameshot/blob/master/LICENSE">
-      <img src="https://img.shields.io/github/license/lupoDharkael/flameshot.svg?style=flat-square" alt="License" />
-    </a>
-    <a href="https://github.com/flameshotapp/flameshotapp.github.io">
-      <img src="https://img.shields.io/github/release/lupoDharkael/flameshot.svg?style=flat-square&label=docs" alt="Docs" />
-    </a>
-  </p>
-</div>
-
-
-
 ## Preview
 
-![image](img/preview/animatedUsage.gif)
+![image](https://github.com/lupoDharkael/flameshot/raw/master/img/preview/animatedUsage.gif)
 
 ## Index
 

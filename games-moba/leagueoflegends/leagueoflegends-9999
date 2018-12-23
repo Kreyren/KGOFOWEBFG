@@ -132,8 +132,6 @@ TEMPDIR="${SOURCEDIR}/image/"
 
 FILESDIR="${SOURCEDIR}/files"
 
-WORKDIR="${SOURCEDIR}/work"
-
 HOMEDIR="${SOURCEDIR}/homedir"
 
 GAMEDIR="/home/${USER}/Games"
@@ -196,26 +194,25 @@ wget https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/Leag
 
 pkg_setup () {
 	# We are in HOMEDIR
-	echo "WARNING: This ebuild is not idiot-proof!\n
-	\n"
+	echo "WARNING: This ebuild is not idiot-proof!
+	"
 	echo "WARNING: To unmerge remove /home/username/Games/${NAME}, ebuild is unable to do that atm."
 
 	# Working around missing USER var.
 	# TODO: can i greb USER var somehow?
-	echo "fixme: ebuild is unable to fetch it from user space.."
+	echo "fixme: ebuild is unable to fetch it from user space..
+	"
 	echo "Enter your username to which we will install wine. (case-sensitive!)"
 	read USER
 
 	region_selection
 
-	mv "${HOMEDIR}/'League Of Legends installer ${REGION}.exe'" "${HOMEDIR}/LeagueOfLegends${REGION}_installer.exe"
-
 	mkdir -p /home/$USER/Games/${NAME}
 
-	WINEPREFIX="/home/{$USER}/Games/${NAME}-${REGION}" wine "${HOMEDIR}/LeagueOfLegends${REGION}_installer.exe --mode unattended"
-
 	# TODO: winetricks shoudn't run as root."
-	WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" winetricks corefonts vcrun2008 vcrun2017 winxp glsl=disabled
+	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" winetricks corefonts vcrun2008 vcrun2017 winxp glsl=disabled
+
+	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" wine /var/tmp/portage/games-emulation/leagueoflegends-9999/homedir/'League of Legends installer EUNE.exe'
 
 	# https://appdb.winehq.org/objectManager.php?sClass=version&iId=36323 is mandatory
 	echo "Downloading Anti-Cheat patchset (Credit: Andrew Wesie)"
@@ -227,12 +224,10 @@ pkg_setup () {
 	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
 	cd /home/${USER}/Games/${NAME}
-	epatch -nf "0003-Pretend-to-have-a-wow64-dll.patch"
-	epatch -nf "patches/0006-Refactor-LdrInitializeThunk.patch"
-	epatch -nf "0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
-	epatch -nf "0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
-
-	WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" wine start /unix "${HOMEDIR}/'League Of Legends installer ${REGION}.exe'"
+	patch -nf "0003-Pretend-to-have-a-wow64-dll.patch"
+	patch -nf "patches/0006-Refactor-LdrInitializeThunk.patch"
+	patch -nf "0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
+	patch -nf "0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
 	echo "KNOWN ISSUES:
 	- Client is laggy

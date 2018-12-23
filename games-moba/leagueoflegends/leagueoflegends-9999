@@ -220,6 +220,8 @@ pkg_setup () {
 
 	echo "KNOWN ISSUE:
 	- Client is laggy
-	- prefix for vista or higher doesn't work
+	- non-client window crashes on startup (patchset required)
 	"
+
+	echo "WARNING: TEST IN PRACTICE TOOL BEFORE GAME!"
 }

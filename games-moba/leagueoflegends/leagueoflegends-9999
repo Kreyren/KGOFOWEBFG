@@ -1,0 +1,197 @@
+# Copyright 1999-2018 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# Based on https://devmanual.gentoo.org/ebuild-writing/variables/index.html
+
+# IMPROVEMENT(?):  take a look at dxvk / bobwya for extra ideas. btw, you should really use bobwya repo for wine as it comes with esync patches.
+
+# E-build API
+EAPI=6
+
+# inherid
+
+NAME="leagueoflegends"
+## Forcing it above a filename to prevent issues if renamed.
+
+CATEGORY="games-emulation"
+
+HOMEPAGE="https://${REGION}.leagueoflegends.com/"
+## Capitalization is irelevant for this URL
+
+DESCRIPTION="Multiplayer online battle arena video game developed and published by Riot Games."
+## Grabbed from wiki
+
+KEYWORDS="~amd64 ~x86"
+
+SLOT="0"
+
+LICENSE="2018 Riot Games, Inc. All rights reserved."
+## TODO: Verify if correct
+
+SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe"
+## Grabbed from lutris
+
+#IUSE="" https://devmanual.gentoo.org/ebuild-writing/variables/index.html#iuse
+## No need for IUSE?
+
+#REQUIRED_USE="" https://devmanual.gentoo.org/ebuild-writing/variables/index.html#required_use
+## No need for REQUIRED_USE?
+
+RESTRICT="bindist,mirror,test,strip"
+## bindist   = Distribution of built packages is restricted.
+### Downloding installer from leagueoflegends.com == restricted(?)
+## mirror    = files in SRC_URI will not be downloaded from the GENTOO_MIRRORS.
+### Downloding from non-gentoo source
+## test 	 = do not run src_test even if user has FEATURES=test.
+### We won't compile, no need to test.
+## strip 	 = final binaries/libraries will not be stripped of debug symbols.
+### We won't compile, no need to strip. Trying to prevent corrruption.
+
+#DEPEND=""
+## We won't compile no need for deps
+
+#BDEPEND=""
+## EAPI=7 function
+
+RDEPEND="
+|| (
+>=app-emulation/wine-staging-3.14
+>=app-emulation/wine-any-3.14
+)"
+## >=app-emulation/wine-any-3.14::gentoo[${MULTILIB_USEDEP},vulkan] ?
+
+PDEPEND=""
+## A list of packages to be installed (if possible) after the package is merged. Use this only when RDEPEND would cause cyclic dependencies.
+## No need atm
+
+PROPERTIES="interactive"
+## A space-delimited list of properties, with conditional syntax support. interactive is the only valid value for now.
+## I have no hugging idea what it means and i'm scared that it starts talking at me.
+## TIP: See the cdrom eclass for PROPERTIES=interactive examples
+
+#DOCS=""
+## An array or space-delimited list of documentation files for the default src_install function to install using dodoc. If undefined, a reasonable default list is used.
+## Useless? In theory i can install it with licence or something?.. with PORO document! 
+
+#HTML_DOCS=""
+## An array or space-delimited list of documentation files or directories for the einstalldocs function to install recursively.
+## Wth is this
+
+
+
+
+
+
+#######################################################################
+##      JAZZHANDS! (Krey's version of gentoo's short hands)          ##
+## License: None from gentoo can use this untill krey is a developer ##
+#######################################################################
+
+PN="${NAME}"
+# PN   = Package Name
+
+PC="${CATEGORY}"
+# PC   = Package Category
+
+PV="${PV}"
+# PV   = Package Version
+
+PNV="${PNV}"
+# PNV  = Package Name Version
+
+PR="${PR}"
+# PR   = Package Revision
+
+PVR="${PVR}"
+# PVR  = Package Version Revision
+
+FPN="${PN}-${PV}-${PR}"
+# PFN  = Full Package Name
+
+SOURCEDIR="/var/tmp/portage/${FPN}"
+
+DISTDIR="${SOURCEDIR}/distdir"
+
+WORKDIR="${SOURCEDIR}/work/"
+
+BUILDDIR="${SOURCEDIR}/build/"
+
+TEMPDIR="${SOURCEDIR}/image/"
+## Temporary Install Directory (Gentoo - D) ... don't ask me why do they call it 'D'
+
+FILESDIR="${SOURCEDIR}/files"
+
+WORKDIR="${SOURCEDIR}/work"
+
+HOME="${SOURCEDIR}/homedir"
+
+
+# A   == 	All the source files for the package (excluding those which are not available because of USE flags).
+
+EP="${D%/}${EPREFIX}/"
+## Shorthand for ${D%/}${EPREFIX}/
+
+EROOT="${ROOT%/}${EPREFIX}/"
+## Shorthand for ${ROOT%/}${EPREFIX}/
+
+# ROOT=""
+## The absolute path to the root directory into which the package is to be merged. Only allowed in pkg_* phases. (https://devmanual.gentoo.org/ebuild-writing/variables/index.html#root)
+## Might be required
+
+# DISTDIR=""
+## Contains the path to the directory where all the files fetched for the package are stored.
+## What?
+
+# EPREFIX=""
+## The normalised offset-prefix path of an offset installation.
+## WHAAAT
+## Prefix of what
+## Offset meaning?
+
+
+
+
+
+
+region_selection () {
+
+	# Not working, ebuild $ebuild manifest outputs regression
+	# VERIFY: no ebuild that i know of reads input from stdin. the only way i can think of to do this is to use useflags. region_us, region_eu and so on. I think you could use net-misc/curl as possible inspiration.
+while [[ ${REGION} != @(EUNE|NA|EUW|BR|LAN|LAS|OCE|RU|JP|SEA) ]]; do 
+echo "Select your region:
+EUNE  - Europe Nordic and East
+NA    - North America
+EUW   - Europe West
+BR    - Brazil
+AN    - Latin America North
+LAS   - Latin America South
+OCE   - Oceania
+RU    - Russia
+TR    - Turkey
+JP    - Japan
+SEA   - South East Asia
+"
+
+read REGION
+
+done
+}
+
+SRC_URI="${REPO}"
+
+src_prepare () {
+	region_selection
+	echo "${USER}"
+	exit 0
+}
+
+src_prepare () {
+	echo "something is not nothing"
+#	cd ${S}
+#	League%20of%20Legends%20installer%20${REGIOn}.exe
+
+}
+
+src_install () {
+	echo "something is not nothing"
+	exit 0
+}

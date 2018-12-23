@@ -1,9 +1,12 @@
 # Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # Based on https://devmanual.gentoo.org/ebuild-writing/
+# ebuild functions https://devmanual.gentoo.org/ebuild-writing/functions/index.html
+
+## Version: Work in progress
 
 # IMPROVEMENT(?):  take a look at dxvk / bobwya for extra ideas. btw, you should really use bobwya repo for wine as it comes with esync patches.
-
+# Make automatic with interactive
 
 
 # E-build API
@@ -30,7 +33,7 @@ SLOT="0"
 LICENSE="2018 Riot Games, Inc. All rights reserved."
 ## TODO: Verify if correct
 
-#SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe"
+#SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20EUNE.exe"
 ## Grabbed from lutris
 
 #IUSE="" https://devmanual.gentoo.org/ebuild-writing/variables/index.html#iuse
@@ -39,7 +42,7 @@ LICENSE="2018 Riot Games, Inc. All rights reserved."
 #REQUIRED_USE="" https://devmanual.gentoo.org/ebuild-writing/variables/index.html#required_use
 ## No need for REQUIRED_USE?
 
-RESTRICT="bindist,mirror,test,strip"
+RESTRICT="bindist,mirror,test,strip,fetch"
 ## bindist   = Distribution of built packages is restricted.
 ### Downloding installer from leagueoflegends.com == restricted(?)
 ## mirror    = files in SRC_URI will not be downloaded from the GENTOO_MIRRORS.
@@ -59,7 +62,8 @@ RDEPEND="
 || (
 >=app-emulation/wine-staging-3.14
 >=app-emulation/wine-any-3.14
-)"
+)
+=app-emulation/winetricks-99999999"
 ## >=app-emulation/wine-any-3.14::gentoo[${MULTILIB_USEDEP},vulkan] ?
 
 PDEPEND=""
@@ -88,6 +92,8 @@ PROPERTIES="interactive"
 ##      JAZZHANDS! (Krey's version of gentoo's short hands)          ##
 ## License: None from gentoo can use this untill krey is a developer ##
 #######################################################################
+
+# Gentoo's variables are read-only it may cause issues
 
 PN="${NAME}"
 # PN   = Package Name
@@ -125,7 +131,9 @@ FILESDIR="${SOURCEDIR}/files"
 
 WORKDIR="${SOURCEDIR}/work"
 
-HOME="${SOURCEDIR}/homedir"
+HOMEDIR="${SOURCEDIR}/homedir"
+
+GAMEDIR="/home/${USER}/Games"
 
 
 # A   == 	All the source files for the package (excluding those which are not available because of USE flags).
@@ -156,6 +164,8 @@ EROOT="${ROOT%/}${EPREFIX}/"
 
 
 region_selection () {
+# WARNING: Unable to implement - https://bugs.gentoo.org/673616
+
 	# Not working, ebuild $ebuild manifest outputs regression
 	# VERIFY: no ebuild that i know of reads input from stdin. the only way i can think of to do this is to use useflags. region_us, region_eu and so on. I think you could use net-misc/curl as possible inspiration.
 while [[ ${REGION} != @(EUNE|NA|EUW|BR|LAN|LAS|OCE|RU|JP|SEA) ]]; do 
@@ -177,19 +187,39 @@ read REGION
 
 done
 
-SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe
-	EUNE?   ( https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe )
-"
+wget https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe
 
 }
 
 pkg_setup () {
-	echo "${USER}"
 	region_selection
-	exit 0
-}
 
-src_install () {
-	echo "something is not nothing"
-	exit 0
+	# pwd + ls = /var/tmp/portage/games-emulation/leagueoflegends-9999/homedir/'League of Legends installer ${REGION}.exe'
+
+	mv "${HOMEDIR}/'League Of Legends installer ${REGION}.exe'" "${HOMEDIR}/LeagueOfLegends${REGION}_installer.exe"
+
+	mkdir -p /home/$USER/Games/${NAME}
+
+	WINEPREFIX="/home/$USER/Games/${NAME}" wine "${HOMEDIR}/LeagueOfLegends${REGION}_installer.exe --mode unattended"
+
+	WINEPREFIX="/home/$USER/Games/${NAME}" winetricks corefonts vcrun2008 vcrun2017 winxp glsl=disabled
+
+	# https://appdb.winehq.org/objectManager.php?sClass=version&iId=36323 is mandatory
+	echo "Downloading Anti-Cheat patchset (Credit: Andrew Wesie)"
+	echo "WARNING: Those patches are safe in case you get banned sent a ticket on riot support and they will unban you."
+
+	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0003-Pretend-to-have-a-wow64-dll.patch"
+	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0006-Refactor-LdrInitializeThunk.patch"	
+	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
+	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
+
+	patch -n "0003-Pretend-to-have-a-wow64-dll.patch"
+	patch -n "patches/0006-Refactor-LdrInitializeThunk.patch"
+	patch -n "0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
+	patch -n "0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
+
+	echo "KNOWN ISSUE:
+	- Client is laggy
+	- prefix for vista or higher doesn't work
+	"
 }

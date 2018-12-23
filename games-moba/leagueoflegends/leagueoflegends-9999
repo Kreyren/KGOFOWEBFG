@@ -3,6 +3,9 @@
 # Based on https://devmanual.gentoo.org/ebuild-writing/
 # ebuild functions https://devmanual.gentoo.org/ebuild-writing/functions/index.html
 
+Related: https://github.com/winepak/applications/blob/master/com.leagueoflegends.Client/com.leagueoflegends.Client.yml
+Related: https://lutris.net/games/install/3552/view
+
 ## Version: Work in progress
 
 # IMPROVEMENT(?):  take a look at dxvk / bobwya for extra ideas. btw, you should really use bobwya repo for wine as it comes with esync patches.

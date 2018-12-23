@@ -1,3 +1,5 @@
+Report issues/suggestion to https://github.com/RXT067/krey-overlay/issues
+
 ## Preview
 
 ![image](https://github.com/lupoDharkael/flameshot/raw/master/img/preview/animatedUsage.gif)

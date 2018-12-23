@@ -1,8 +1,10 @@
 # Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# Based on https://devmanual.gentoo.org/ebuild-writing/variables/index.html
+# Based on https://devmanual.gentoo.org/ebuild-writing/
 
 # IMPROVEMENT(?):  take a look at dxvk / bobwya for extra ideas. btw, you should really use bobwya repo for wine as it comes with esync patches.
+
+
 
 # E-build API
 EAPI=6
@@ -20,14 +22,15 @@ HOMEPAGE="https://${REGION}.leagueoflegends.com/"
 DESCRIPTION="Multiplayer online battle arena video game developed and published by Riot Games."
 ## Grabbed from wiki
 
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
+# PBE will use testing
 
 SLOT="0"
 
 LICENSE="2018 Riot Games, Inc. All rights reserved."
 ## TODO: Verify if correct
 
-SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe"
+#SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe"
 ## Grabbed from lutris
 
 #IUSE="" https://devmanual.gentoo.org/ebuild-writing/variables/index.html#iuse
@@ -105,7 +108,7 @@ PVR="${PVR}"
 # PVR  = Package Version Revision
 
 FPN="${PN}-${PV}-${PR}"
-# PFN  = Full Package Name
+# FPN  = Full Package Name
 
 SOURCEDIR="/var/tmp/portage/${FPN}"
 
@@ -153,7 +156,6 @@ EROOT="${ROOT%/}${EPREFIX}/"
 
 
 region_selection () {
-
 	# Not working, ebuild $ebuild manifest outputs regression
 	# VERIFY: no ebuild that i know of reads input from stdin. the only way i can think of to do this is to use useflags. region_us, region_eu and so on. I think you could use net-misc/curl as possible inspiration.
 while [[ ${REGION} != @(EUNE|NA|EUW|BR|LAN|LAS|OCE|RU|JP|SEA) ]]; do 
@@ -174,21 +176,17 @@ SEA   - South East Asia
 read REGION
 
 done
+
+SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe
+	EUNE?   ( https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe )
+"
+
 }
 
-SRC_URI="${REPO}"
-
-src_prepare () {
-	region_selection
+pkg_setup () {
 	echo "${USER}"
+	region_selection
 	exit 0
-}
-
-src_prepare () {
-	echo "something is not nothing"
-#	cd ${S}
-#	League%20of%20Legends%20installer%20${REGIOn}.exe
-
 }
 
 src_install () {

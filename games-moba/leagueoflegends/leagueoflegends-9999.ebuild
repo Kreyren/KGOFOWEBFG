@@ -41,11 +41,11 @@ NAME="leagueoflegends"
 CATEGORY="games-emulation"
 # TODO: make games-moba
 
-HOMEPAGE="https://${REGION}.leagueoflegends.com/"
-## Capitalization is irelevant for this URL
-
 DESCRIPTION="Multiplayer online battle arena video game developed and published by Riot Games."
 ## Grabbed from wiki
+
+HOMEPAGE="https://${REGION}.leagueoflegends.com/"
+## Capitalization is irelevant for this URL
 
 KEYWORDS="amd64 x86"
 # PBE will use testing
@@ -111,74 +111,76 @@ PROPERTIES="interactive"
 
 
 jazzhands () {
-##################################################################################
-##               JAZZHANDS! (Krey's version of gentoo's short hands)            ##
-##     License: None from gentoo can use this untill kreyren is ebuild master   ##
-##################################################################################
+	##################################################################################
+	##               JAZZHANDS! (Krey's version of gentoo's short hands)            ##
+	##     License: None from gentoo can use this untill kreyren is ebuild master   ##
+	##################################################################################
 
-# Gentoo's variables are read-only it may cause issues
+	# Gentoo's variables are read-only it may cause issues
 
-PN="${NAME}"
-# PN   = Package Name
+	PN="${NAME}"
+	# PN   = Package Name
 
-PC="${CATEGORY}"
-# PC   = Package Category
+	PC="${CATEGORY}"
+	# PC   = Package Category
 
-PV="${PV}"
-# PV   = Package Version
+	PV="${PV}"
+	# PV   = Package Version
 
-PNV="${PNV}"
-# PNV  = Package Name Version
+	PNV="${PNV}"
+	# PNV  = Package Name Version
 
-#PR="${PR}"
-PR=""
-# PR   = Package Revision
+	#PR="${PR}"
+	PR=""
+	# PR   = Package Revision
 
-PVR="${PVR}"
-# PVR  = Package Version Revision
+	PVR="${PVR}"
+	# PVR  = Package Version Revision
 
-FPN="${PN}-${PV}-${PR}"
-# FPN  = Full Package Name
+	FPN="${PN}-${PV}-${PR}"
+	# FPN  = Full Package Name
 
-SOURCEDIR="/var/tmp/portage/${FPN}"
+	SOURCEDIR="/var/tmp/portage/${FPN}"
 
-DISTDIR="${SOURCEDIR}/distdir"
+	DISTDIR="${SOURCEDIR}/distdir"
 
-WORKDIR="${SOURCEDIR}/work/"
+	WORKDIR="{PORTAGE_BUILDDIR}/work"
 
-BUILDDIR="${SOURCEDIR}/build/"
+	BUILDDIR="${SOURCEDIR}/build"
 
-TEMPDIR="${SOURCEDIR}/image/"
-## Temporary Install Directory (Gentoo - D) ... don't ask me why do they call it 'D'
+	TEMPDIR="${SOURCEDIR}/image"
+	## Temporary Install Directory (Gentoo - D) ... don't ask me why do they call it 'D'
 
-FILESDIR="${SOURCEDIR}/files"
+	#FILESDIR="${SOURCEDIR}/files"
 
-HOMEDIR="${SOURCEDIR}/homedir"
+	HOMEDIR="${SOURCEDIR}/homedir"
 
-GAMEDIR="/home/${USER}/Games"
+	GAMEDIR="/opt/games"
+
+	LOLDIR="${GAMEDIR}/${NAME}-${REGION}"
 
 
-# A   == 	All the source files for the package (excluding those which are not available because of USE flags).
+	# A   == 	All the source files for the package (excluding those which are not available because of USE flags).
 
-EP="${D%/}${EPREFIX}/"
-## Shorthand for ${D%/}${EPREFIX}/
+	EP="${D%/}${EPREFIX}/"
+	## Shorthand for ${D%/}${EPREFIX}/
 
-EROOT="${ROOT%/}${EPREFIX}/"
-## Shorthand for ${ROOT%/}${EPREFIX}/
+	#EROOT="${ROOT%/}${EPREFIX}/"
+	## Shorthand for ${ROOT%/}${EPREFIX}/
 
-# ROOT=""
-## The absolute path to the root directory into which the package is to be merged. Only allowed in pkg_* phases. (https://devmanual.gentoo.org/ebuild-writing/variables/index.html#root)
-## Might be required
+	# ROOT=""
+	## The absolute path to the root directory into which the package is to be merged. Only allowed in pkg_* phases. (https://devmanual.gentoo.org/ebuild-writing/variables/index.html#root)
+	## Might be required
 
-# DISTDIR=""
-## Contains the path to the directory where all the files fetched for the package are stored.
-## What?
+	# DISTDIR=""
+	## Contains the path to the directory where all the files fetched for the package are stored.
+	## What?
 
-# EPREFIX=""
-## The normalised offset-prefix path of an offset installation.
-## WHAAAT
-## Prefix of what
-## Offset meaning?
+	# EPREFIX=""
+	## The normalised offset-prefix path of an offset installation.
+	## WHAAAT
+	## Prefix of what
+	## Offset meaning?
 
 }
 
@@ -186,24 +188,22 @@ EROOT="${ROOT%/}${EPREFIX}/"
 
 
 region_selection () {
-	# Not working, ebuild $ebuild manifest outputs regression
-	# VERIFY: no ebuild that i know of reads input from stdin. the only way i can think of to do this is to use useflags. region_us, region_eu and so on. I think you could use net-misc/curl as possible inspiration.
-while [[ ${REGION} != @(EUNE|NA|EUW|BR|LAN|LAS|OCE|RU|JP|SEA) ]]; do 
-echo "Select your region:
-EUNE  - Europe Nordic and East
-NA    - North America
-EUW   - Europe West
-BR    - Brazil
-AN    - Latin America North
-LAS   - Latin America South
-OCE   - Oceania
-RU    - Russia
-TR    - Turkey
-JP    - Japan
-SEA   - South East Asia
-"
+	while [[ ${REGION} != @(EUNE|NA|EUW|BR|LAN|LAS|OCE|RU|JP|SEA) ]]; do 
+	echo "Select your region:
+	EUNE  - Europe Nordic and East
+	NA    - North America
+	EUW   - Europe West
+	BR    - Brazil
+	AN    - Latin America North
+	LAS   - Latin America South
+	OCE   - Oceania
+	RU    - Russia
+	TR    - Turkey
+	JP    - Japan
+	SEA   - South East Asia
+	"
 
-read REGION
+	read REGION
 
 done
 
@@ -213,28 +213,30 @@ wget https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/Leag
 
 pkg_setup () {
 	jazzhands
-	
-	# We are in HOMEDIR
-	echo "WARNING: This ebuild is not idiot-proof, proceed with care!
-	"
-	echo "WARNING: To unmerge remove /home/username/Games/${NAME}, ebuild is unable to do that atm."
 
+	cd "${HOMEDIR}"
+
+	echo "WARNING: To unmerge remove ${GAMEDIR}/${NAME}-${REGION}, ebuild is unable to do that atm."
+	# TODO: Unable to unmerge
+
+	# == DISABLED ==
 	# Working around missing USER var.
 	# TODO: can i greb USER var somehow?
-	echo "fixme: ebuild is unable to fetch it from user space..
-	"
-	echo "Enter your username to which we will install wine (case-sensitive!)"
-	read USER
+	# VERIFY: `awk -F'[/:]' '{if ($3 >= 1000 && $3 != 65534) print $1}' /etc/passwd` 
+	#echo "Ebuild is unable to read USER var, please enter your username to which we install wine (case-sensitive!)"
+	#read USER
 
 	region_selection
 
-	mkdir -p /home/$USER/Games/${NAME}
+	mkdir -p "$LOLDIR"
+	# TODO: add option for WINE_USER make.conf config for WINEDIR.
 
 	# TODO: winetricks shoudn't run as root."
-	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" winetricks corefonts adobeair vcrun2008 vcrun2017 winxp glsl=disabled
+	## IMPROVEMENT: Using chown to reset right after?
+	WINEDEBUG="-all" WINEPREFIX="${LOLDIR}" winetricks corefonts adobeair vcrun2008 vcrun2017 winxp glsl=disabled
 	## Adobeair = unconfirmed
 
-	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" wine "{HOMEDIR}/'League of Legends installer EUNE.exe'"
+	WINEDEBUG="-all" WINEPREFIX="${LOLDIR}" wine "{HOMEDIR}/'League of Legends installer $REGION.exe'"
 
 	# https://appdb.winehq.org/objectManager.php?sClass=version&iId=36323 is mandatory
 	echo "Downloading Anti-Cheat patchset (Credit: Andrew Wesie)"
@@ -251,6 +253,8 @@ pkg_setup () {
 	mv "${HOMEDIR}/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch" "${FILESDIR}/"
 
 	# TODO: https://devmanual.gentoo.org/ebuild-writing/misc-files/patches/index.html
+	# IMPROVEMENT: improve http://mywiki.wooledge.org/glob#extglob
+	# IMPROVEMENT: http://ix.io/1wHD
 	#if [[ -e ${FILESDIR}/@(0003-Pretend-to-have-a-wow64-dll.patch&0006-Refactor-LdrInitializeThunk.patch&0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch&0009-Refactor-__wine_syscall_dispatcher-for-i386.patch) ]]; then
 	if [[ -e "${FILESDIR}/0003-Pretend-to-have-a-wow64-dll.patch" ]] && [[ -e "${FILESDIR}/0006-Refactor-LdrInitializeThunk.patch" ]] && [[ -e "${FILESDIR}/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch" ]] && [[ -e "${FILESDIR}/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch" ]]; then
 		epatch -p1 "${FILESDIR}/0003-Pretend-to-have-a-wow64-dll.patch"
@@ -260,6 +264,7 @@ pkg_setup () {
 
 		else
 			echo "FATAL: Patches was NOT detected in ${FILESDIR}"
+			# TODO: try to re-fetch?
 			echo "Please apply them manually from https://github.com/RXT067/krey-overlay/tree/master/games-moba/leagueoflegends/patches"
 	fi
 
@@ -268,3 +273,8 @@ pkg_setup () {
 	echo "INFO: Report issues on https://github.com/RXT067/krey-overlay, any info is helpful."
 
 }
+
+# IMPROVEMENT 
+## afair pkg_postinstall is when you get outside sandbox but I suggest to avoid that and just creat script for users to run afterwards
+## some of users may not have different wine directories and it may cause problems for them
+## if you want to make your ebuild for many users respect that

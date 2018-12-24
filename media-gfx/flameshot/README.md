@@ -1,5 +1,7 @@
 Report issues/suggestion to https://github.com/RXT067/krey-overlay/issues
 
+TODO: Fix P variable
+
 ## Preview
 
 ![image](https://github.com/lupoDharkael/flameshot/raw/master/img/preview/animatedUsage.gif)

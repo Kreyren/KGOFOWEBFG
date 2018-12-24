@@ -3,6 +3,19 @@
 # Based on https://devmanual.gentoo.org/ebuild-writing/
 # ebuild functions https://devmanual.gentoo.org/ebuild-writing/functions/index.html
 
+# KNOWN ISSUES
+## Client is slow
+### Adobe Air needed?
+#### Adobe Air is broken in winetricks, created issue https://github.com/Winetricks/winetricks/issues/1158 = ROADBLOCK
+## Game-window crashes on startup
+### Andew Wesie patches are mandatory
+## Game-window has no audio
+### Fix unknown
+### Related: https://bugs.winehq.org/show_bug.cgi?id=45934
+## Game-window ignores input from keyword
+### Fix unknown
+
+
 # Related: https://github.com/winepak/applications/blob/master/com.leagueoflegends.Client/com.leagueoflegends.Client.yml
 # Related: https://lutris.net/games/install/3552/view
 # Related: https://bugs.winehq.org/show_bug.cgi?id=45934
@@ -14,6 +27,7 @@
 # Make automatic with interactive
 
 # TODO: winetricks is annoying with GUI, sourcing them with ebuild might be more effective?
+## Related: https://github.com/Winetricks/winetricks/pull/1090
 
 
 # E-build API
@@ -69,7 +83,7 @@ RESTRICT="bindist,mirror,test,strip,fetch"
 
 RDEPEND="
 || (
->=app-emulation/wine-staging-3.14::gentoo
+>=app-emulation/wine-staging-3.14
 >=app-emulation/wine-any-3.14
 )
 =app-emulation/winetricks-99999999"
@@ -232,7 +246,7 @@ pkg_setup () {
 	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
 	cd /home/${USER}/Games/${NAME}
-	
+
 	patch -nf "0003-Pretend-to-have-a-wow64-dll.patch"
 	patch -nf "patches/0006-Refactor-LdrInitializeThunk.patch"
 	patch -nf "0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"

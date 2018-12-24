@@ -3,16 +3,17 @@
 # Based on https://devmanual.gentoo.org/ebuild-writing/
 # ebuild functions https://devmanual.gentoo.org/ebuild-writing/functions/index.html
 
-Related: https://github.com/winepak/applications/blob/master/com.leagueoflegends.Client/com.leagueoflegends.Client.yml
-Related: https://lutris.net/games/install/3552/view
-Related: https://bugs.winehq.org/show_bug.cgi?id=45934
+# Related: https://github.com/winepak/applications/blob/master/com.leagueoflegends.Client/com.leagueoflegends.Client.yml
+# Related: https://lutris.net/games/install/3552/view
+# Related: https://bugs.winehq.org/show_bug.cgi?id=45934
+# Related: https://github.com/bobwya/gentoo-wine-esync
 
 ## Version: Work in progress
 
 # IMPROVEMENT(?):  take a look at dxvk / bobwya for extra ideas. btw, you should really use bobwya repo for wine as it comes with esync patches.
 # Make automatic with interactive
 
-#TODO: winetricks is annoying with GUI, sourcing them with ebuild might be more effective?
+# TODO: winetricks is annoying with GUI, sourcing them with ebuild might be more effective?
 
 
 # E-build API
@@ -24,6 +25,7 @@ NAME="leagueoflegends"
 ## Forcing it above a filename to prevent issues if renamed.
 
 CATEGORY="games-emulation"
+# TODO: make games-moba
 
 HOMEPAGE="https://${REGION}.leagueoflegends.com/"
 ## Capitalization is irelevant for this URL
@@ -42,8 +44,9 @@ LICENSE="2018 Riot Games, Inc. All rights reserved."
 #SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20EUNE.exe"
 ## Grabbed from lutris
 
-#IUSE="" https://devmanual.gentoo.org/ebuild-writing/variables/index.html#iuse
-## No need for IUSE?
+IUSE="staging run-exes vulkan mono" 
+## https://devmanual.gentoo.org/ebuild-writing/variables/index.html#iuse
+## wine-staging has staging use flag
 
 #REQUIRED_USE="" https://devmanual.gentoo.org/ebuild-writing/variables/index.html#required_use
 ## No need for REQUIRED_USE?
@@ -66,7 +69,7 @@ RESTRICT="bindist,mirror,test,strip,fetch"
 
 RDEPEND="
 || (
->=app-emulation/wine-staging-3.14
+>=app-emulation/wine-staging-3.14::gentoo
 >=app-emulation/wine-any-3.14
 )
 =app-emulation/winetricks-99999999"
@@ -198,7 +201,7 @@ wget https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/Leag
 
 pkg_setup () {
 	# We are in HOMEDIR
-	echo "WARNING: This ebuild is not idiot-proof!
+	echo "WARNING: This ebuild is not idiot-proof, proceed with care!
 	"
 	echo "WARNING: To unmerge remove /home/username/Games/${NAME}, ebuild is unable to do that atm."
 
@@ -214,7 +217,8 @@ pkg_setup () {
 	mkdir -p /home/$USER/Games/${NAME}
 
 	# TODO: winetricks shoudn't run as root."
-	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" winetricks corefonts vcrun2008 vcrun2017 winxp glsl=disabled
+	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" winetricks corefonts adobeair vcrun2008 vcrun2017 winxp glsl=disabled
+	## Adobeair = unconfirmed
 
 	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" wine /var/tmp/portage/games-emulation/leagueoflegends-9999/homedir/'League of Legends installer EUNE.exe'
 
@@ -228,16 +232,14 @@ pkg_setup () {
 	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
 	cd /home/${USER}/Games/${NAME}
+	
 	patch -nf "0003-Pretend-to-have-a-wow64-dll.patch"
 	patch -nf "patches/0006-Refactor-LdrInitializeThunk.patch"
 	patch -nf "0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
 	patch -nf "0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
-	echo "KNOWN ISSUES:
-	- Client is laggy
-	- non-client window crashes on startup (patchset required)
-			"
-
 	echo "WARNING: TEST IN PRACTICE TOOL BEFORE GAME!"
+
+	echo "INFO: Report issues on https://github.com/RXT067/krey-overlay, any info is helpful."
 
 }

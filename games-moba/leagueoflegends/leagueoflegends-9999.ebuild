@@ -245,13 +245,16 @@ pkg_setup () {
 	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
 	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
-	cd /home/${USER}/Games/${NAME}
+	mv "${HOMEDIR}/0003-Pretend-to-have-a-wow64-dll.patch" "${FILESDIR}/"
+	mv "${HOMEDIR}/0006-Refactor-LdrInitializeThunk.patch" "${FILESDIR}/"
+	mv "${HOMEDIR}/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch" "${FILESDIR}/"
+	mv "${HOMEDIR}/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch" "${FILESDIR}/"
 
 	# TODO: https://devmanual.gentoo.org/ebuild-writing/misc-files/patches/index.html
-	patch -nf "0003-Pretend-to-have-a-wow64-dll.patch"
-	patch -nf "patches/0006-Refactor-LdrInitializeThunk.patch"
-	patch -nf "0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
-	patch -nf "0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
+	epatch -p1 "${FILESDIR}/0003-Pretend-to-have-a-wow64-dll.patch"
+	epatch -p1 "${FILESDIR}/0006-Refactor-LdrInitializeThunk.patch"
+	epatch -p1 "${FILESDIR}/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
+	epatch -p1 "${FILESDIR}/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
 	echo "WARNING: TEST IN PRACTICE TOOL BEFORE GAME!"
 

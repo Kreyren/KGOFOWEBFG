@@ -110,10 +110,11 @@ PROPERTIES="interactive"
 
 
 
-
-#######################################################################
-##      JAZZHANDS! (Krey's version of gentoo's short hands)          ##
-#######################################################################
+jazzhands () {
+##################################################################################
+##               JAZZHANDS! (Krey's version of gentoo's short hands)            ##
+##     License: None from gentoo can use this untill kreyren is ebuild master   ##
+##################################################################################
 
 # Gentoo's variables are read-only it may cause issues
 
@@ -179,14 +180,12 @@ EROOT="${ROOT%/}${EPREFIX}/"
 ## Prefix of what
 ## Offset meaning?
 
-
+}
 
 
 
 
 region_selection () {
-# WARNING: Unable to implement - https://bugs.gentoo.org/673616
-
 	# Not working, ebuild $ebuild manifest outputs regression
 	# VERIFY: no ebuild that i know of reads input from stdin. the only way i can think of to do this is to use useflags. region_us, region_eu and so on. I think you could use net-misc/curl as possible inspiration.
 while [[ ${REGION} != @(EUNE|NA|EUW|BR|LAN|LAS|OCE|RU|JP|SEA) ]]; do 
@@ -213,6 +212,8 @@ wget https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/Leag
 }
 
 pkg_setup () {
+	jazzhands
+	
 	# We are in HOMEDIR
 	echo "WARNING: This ebuild is not idiot-proof, proceed with care!
 	"

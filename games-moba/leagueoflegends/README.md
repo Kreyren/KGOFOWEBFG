@@ -7,17 +7,3 @@ Merge requests are not accepted for this ebuild at this moment due it's butterfl
 
 Any suggestion/opinion iswelcomed.
 
-
-### KNOWN ISSUES
-
-- Client is slow
- -- AdobeAir needed?
-  --- Winetricks has issues with mismatch for adobeair on crazy, testing and stable.
-
-- non-client window crashes on startup
- -- Andrew Wesie patches are required and provided with this ebuild. 
-
-- Game has no audio excluding launcher
-	-- Fix unknown
-	 --- Related: https://bugs.winehq.org/show_bug.cgi?id=45934
-

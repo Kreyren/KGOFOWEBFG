@@ -234,7 +234,7 @@ pkg_setup () {
 	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" winetricks corefonts adobeair vcrun2008 vcrun2017 winxp glsl=disabled
 	## Adobeair = unconfirmed
 
-	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" wine /var/tmp/portage/games-emulation/leagueoflegends-9999/homedir/'League of Legends installer EUNE.exe'
+	WINEDEBUG="-all" WINEPREFIX="/home/${USER}/Games/${NAME}-${REGION}" wine "{HOMEDIR}/'League of Legends installer EUNE.exe'"
 
 	# https://appdb.winehq.org/objectManager.php?sClass=version&iId=36323 is mandatory
 	echo "Downloading Anti-Cheat patchset (Credit: Andrew Wesie)"

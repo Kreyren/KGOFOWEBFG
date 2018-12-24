@@ -113,7 +113,6 @@ PROPERTIES="interactive"
 
 #######################################################################
 ##      JAZZHANDS! (Krey's version of gentoo's short hands)          ##
-## License: None from gentoo can use this untill krey is a developer ##
 #######################################################################
 
 # Gentoo's variables are read-only it may cause issues

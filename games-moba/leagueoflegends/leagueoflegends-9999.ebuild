@@ -223,7 +223,7 @@ pkg_setup () {
 	# TODO: can i greb USER var somehow?
 	echo "fixme: ebuild is unable to fetch it from user space..
 	"
-	echo "Enter your username to which we will install wine. (case-sensitive!)"
+	echo "Enter your username to which we will install wine (case-sensitive!)"
 	read USER
 
 	region_selection
@@ -247,6 +247,7 @@ pkg_setup () {
 
 	cd /home/${USER}/Games/${NAME}
 
+	# TODO: https://devmanual.gentoo.org/ebuild-writing/misc-files/patches/index.html
 	patch -nf "0003-Pretend-to-have-a-wow64-dll.patch"
 	patch -nf "patches/0006-Refactor-LdrInitializeThunk.patch"
 	patch -nf "0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"

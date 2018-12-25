@@ -7,5 +7,5 @@ Current: https://youtu.be/aM6Tn45vTSo
 ### CONTRIBUTION
 Merge requests are not accepted for this ebuild at this moment due it's butterflyii coding,  will be accepted once the ebuild is in version v0.1+ (currently in 0.0-concept).
 
-Any suggestion/opinion iswelcomed.
+Any suggestion/opinion is welcomed.
 

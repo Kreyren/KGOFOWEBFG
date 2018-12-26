@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation and Kreyren
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # Based on https://devmanual.gentoo.org/ebuild-writing/
 # ebuild functions https://devmanual.gentoo.org/ebuild-writing/functions/index.html
@@ -7,6 +7,7 @@
 ## Client is slow
 ### Adobe Air needed?
 #### Adobe Air is broken in winetricks, created issue https://github.com/Winetricks/winetricks/issues/1158 = ROADBLOCK
+#### FIX: https://github.com/Winetricks/winetricks/pull/1160
 ## Game-window crashes on startup
 ### Andew Wesie patches are mandatory
 ## Game-window has no audio
@@ -55,7 +56,7 @@ SLOT="0"
 LICENSE="2018 Riot Games, Inc. All rights reserved."
 ## TODO: Verify if correct
 
-#SRC_URI="https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20EUNE.exe"
+SRC_URI="https://paste.pound-python.org/raw/fRhH9QAxDI0e8FVGrPUu/"
 ## Grabbed from lutris
 
 IUSE="staging run-exes vulkan mono" 
@@ -64,6 +65,8 @@ IUSE="staging run-exes vulkan mono"
 
 #REQUIRED_USE="" https://devmanual.gentoo.org/ebuild-writing/variables/index.html#required_use
 ## No need for REQUIRED_USE?
+
+FEATURES="userpriv" # https://devmanual.gentoo.org/general-concepts/features/index.html
 
 RESTRICT="bindist,mirror,test,strip,fetch"
 ## bindist   = Distribution of built packages is restricted.
@@ -109,7 +112,6 @@ PROPERTIES="interactive"
 
 
 
-
 jazzhands () {
 	##################################################################################
 	##               JAZZHANDS! (Krey's version of gentoo's short hands)            ##
@@ -130,21 +132,22 @@ jazzhands () {
 	PNV="${PNV}"
 	# PNV  = Package Name Version
 
-	#PR="${PR}"
-	PR=""
+	PR="${PR}"
+	#PR=""
 	# PR   = Package Revision
 
 	PVR="${PVR}"
 	# PVR  = Package Version Revision
 
-	FPN="${PN}-${PV}-${PR}"
+	FPN=${PN}-${PVR}
 	# FPN  = Full Package Name
 
-	SOURCEDIR="/var/tmp/portage/${FPN}"
+	SOURCEDIR="/var/tmp/portage/${PC}/${FPN}"
 
 	DISTDIR="${SOURCEDIR}/distdir"
 
-	WORKDIR="{PORTAGE_BUILDDIR}/work"
+#	WORKDIR="{PORTAGE_BUILDDIR}/work"
+## READ-ONLY VAR
 
 	BUILDDIR="${SOURCEDIR}/build"
 
@@ -158,6 +161,8 @@ jazzhands () {
 	GAMEDIR="/opt/games"
 
 	LOLDIR="${GAMEDIR}/${NAME}-${REGION}"
+
+	LOL_INSTALLER="${SOURCEDIR}/homedir/League\ of\ Legends\ installer\ EUNE.exe'"
 
 
 	# A   == 	All the source files for the package (excluding those which are not available because of USE flags).
@@ -206,38 +211,44 @@ region_selection () {
 	read REGION
 
 done
+}
 
-wget https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe
+pkg-setup () {
+	cd "${HOMEDIR}"
+
+	jazzhands
+
+	echo "
+	WARNING: To unmerge remove ${LOLDIR}, ebuild is unable to do that atm.
+	"
+	# TODO: Unable to unmerge
+
+	region_selection # Get REGION var
+
+	wget https://riotgamespatcher-a.akamaihd.net/releases/live/installer/deploy/League%20of%20Legends%20installer%20${REGION}.exe directory-prefix="${HOMEDIR}"
 
 }
 
-pkg_setup () {
-	jazzhands
-
-	cd "${HOMEDIR}"
-
-	echo "WARNING: To unmerge remove ${GAMEDIR}/${NAME}-${REGION}, ebuild is unable to do that atm."
-	# TODO: Unable to unmerge
-
-	# == DISABLED ==
-	# Working around missing USER var.
-	# TODO: can i greb USER var somehow?
-	# VERIFY: `awk -F'[/:]' '{if ($3 >= 1000 && $3 != 65534) print $1}' /etc/passwd` 
-	#echo "Ebuild is unable to read USER var, please enter your username to which we install wine (case-sensitive!)"
-	#read USER
-
-	region_selection
-
-	mkdir -p "$LOLDIR"
-	# TODO: add option for WINE_USER make.conf config for WINEDIR.
+src_prepare () {
+## pkg_* does not support user priv
 
 	# TODO: winetricks shoudn't run as root."
-	## IMPROVEMENT: Using chown to reset right after?
+	## FEATURES="userpriv" ? Master Index lacks the info..
+	# IMPROVEMENT: Using chown to reset right after?
+	# RELATED: https://forums.gentoo.org/viewtopic.php?t=37913
 	WINEDEBUG="-all" WINEPREFIX="${LOLDIR}" winetricks corefonts adobeair vcrun2008 vcrun2017 winxp glsl=disabled
 	## Adobeair = unconfirmed
 
-	WINEDEBUG="-all" WINEPREFIX="${LOLDIR}" wine "{HOMEDIR}/'League of Legends installer $REGION.exe'"
+	WINEDEBUG="-all" WINEPREFIX="${LOLDIR}" wine "${LOL_INSTALLER}"
 
+
+	echo "WARNING: TEST IN PRACTICE TOOL BEFORE GAME!"
+
+	echo "INFO: Report issues on https://github.com/RXT067/krey-overlay, any info is helpful."
+
+}
+
+pkg_prepare () {
 	# https://appdb.winehq.org/objectManager.php?sClass=version&iId=36323 is mandatory
 	echo "Downloading Anti-Cheat patchset (Credit: Andrew Wesie)"
 	echo "WARNING: Those patches are safe in case you get banned sent a ticket on riot support and they will unban you."
@@ -247,14 +258,10 @@ pkg_setup () {
 	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
 	wget "https://raw.githubusercontent.com/RXT067/krey-overlay/master/games-moba/leagueoflegends/patches/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
-	mv "${HOMEDIR}/0003-Pretend-to-have-a-wow64-dll.patch" "${FILESDIR}/"
-	mv "${HOMEDIR}/0006-Refactor-LdrInitializeThunk.patch" "${FILESDIR}/"
-	mv "${HOMEDIR}/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch" "${FILESDIR}/"
-	mv "${HOMEDIR}/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch" "${FILESDIR}/"
-
 	# TODO: https://devmanual.gentoo.org/ebuild-writing/misc-files/patches/index.html
 	# IMPROVEMENT: improve http://mywiki.wooledge.org/glob#extglob
 	# IMPROVEMENT: http://ix.io/1wHD
+	# INFO: https://devmanual.gentoo.org/ebuild-writing/functions/src_prepare/epatch/index.html
 	#if [[ -e ${FILESDIR}/@(0003-Pretend-to-have-a-wow64-dll.patch&0006-Refactor-LdrInitializeThunk.patch&0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch&0009-Refactor-__wine_syscall_dispatcher-for-i386.patch) ]]; then
 	if [[ -e "${FILESDIR}/0003-Pretend-to-have-a-wow64-dll.patch" ]] && [[ -e "${FILESDIR}/0006-Refactor-LdrInitializeThunk.patch" ]] && [[ -e "${FILESDIR}/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch" ]] && [[ -e "${FILESDIR}/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch" ]]; then
 		epatch -p1 "${FILESDIR}/0003-Pretend-to-have-a-wow64-dll.patch"
@@ -262,16 +269,17 @@ pkg_setup () {
 		epatch -p1 "${FILESDIR}/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch"
 		epatch -p1 "${FILESDIR}/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch"
 
+		mv "${HOMEDIR}/0003-Pretend-to-have-a-wow64-dll.patch" "${FILESDIR}/"
+		mv "${HOMEDIR}/0006-Refactor-LdrInitializeThunk.patch" "${FILESDIR}/"
+		mv "${HOMEDIR}/0007-Refactor-RtlCreateUserThread-into-NtCreateThreadEx.patch" "${FILESDIR}/"
+		mv "${HOMEDIR}/0009-Refactor-__wine_syscall_dispatcher-for-i386.patch" "${FILESDIR}/"
+
 		else
 			echo "FATAL: Patches was NOT detected in ${FILESDIR}"
 			# TODO: try to re-fetch?
 			echo "Please apply them manually from https://github.com/RXT067/krey-overlay/tree/master/games-moba/leagueoflegends/patches"
+			die
 	fi
-
-	echo "WARNING: TEST IN PRACTICE TOOL BEFORE GAME!"
-
-	echo "INFO: Report issues on https://github.com/RXT067/krey-overlay, any info is helpful."
-
 }
 
 # IMPROVEMENT 

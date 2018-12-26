@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation and Kreyren
 # Distributed under the terms of the GNU General Public License v2
 # Based on https://devmanual.gentoo.org/ebuild-writing/
 # ebuild functions https://devmanual.gentoo.org/ebuild-writing/functions/index.html

@@ -1,6 +1,6 @@
 # KREYREN!! 
  
-They kept me in the dark, but i know they all.. emerge..
+**They kept me in the dark, but i know they all.. emerge..
 They kept me in the dark and so it all.. BEGAN..!
 
 Send your contribs in.. Sing as their merges go marching in.. again..
@@ -25,4 +25,4 @@ Same old story #
 
 WHAT IF I SAY I'M NOT LIKE THE OTHERS?!! WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR PLAYS? I'M THE MAINTAINER!! WHAT IF I SAY I WILL NEVER SURENDER?!! 
 
-WHAT IF I SAY I'M NOT LIKE THE OTHERS?!! WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR PLAYS? I'M THE MAINTAINER!! WHAT IF I SAY I WILL NEVER SUUUUUUURENDEEEERRR?!! 
+WHAT IF I SAY I'M NOT LIKE THE OTHERS?!! WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR PLAYS? I'M THE MAINTAINER!! WHAT IF I SAY I WILL NEVER SUUUUUUURENDEEEERRR?!!**

@@ -1,6 +1,7 @@
 Report issues/suggestion to https://github.com/RXT067/krey-overlay/issues
 
 TODO: Fix P variable
+TODO: Needs to be rebuilt
 
 ## Preview
 

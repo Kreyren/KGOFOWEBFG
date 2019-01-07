@@ -1,6 +1,6 @@
 # KREYREN!! 
 
-Krey's Garbage Overlay for Gentoo
+Krey's Garbage Overlay Full Of Wierd Enoch Builds For Gentoo 
  
 *They kept me in the dark, but i know they all.. emerge..* </br>
 *They kept me in the dark and so it all.. BEGAN..!* </br>

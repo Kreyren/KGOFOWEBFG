@@ -1,0 +1,467 @@
+# Distributed under the terms of the GNU General Public License v2
+# Based on master index https://devmanual.gentoo.org/
+# Disclaimer: This ebuild is source to be translated into a gentoo's code ethigues
+
+EAPI=7
+
+LINK_ON_REPOSITORY="github.com/Kreyren/Phoenicis-Overlay"
+
+# TEST1_TEST2 - VAR MANIPULATION (http://wiki.bash-hackers.org/syntax/pe)
+## %_TEST2 -> TEST2
+## ##TEST2 -> TEST1
+
+# PN=foo MPV=bar; echo "$PN-$MPV${PR:+-$PR}"; PR=baz; echo "$PN-$MPV${PR:+-$PR}";
+## <shbot> pj: foo-bar
+## <shbot> pj: foo-bar-baz
+## <01> kreyren: also ...
+## <01> !caps > kreyren
+## <greybot> kreyren: By convention, environment variables (PATH, EDITOR, SHELL, ...) and internal shell variables (BASH_VERSION, RANDOM, ...) are fully capitalized. All other variable names should be lowercase. Since variable names are case-sensitive, this convention avoids accidentally overriding environmental and internal variables.
+
+## OVERRIDES
+DEPEND=$DEPENDENCIES 
+RDEPEND=$RUNTIME_DEPENDENDIES
+PDEPEND=$POST_DEPENDENDANCIES
+
+# Assuming that PV==<NUM>.<NUM>_{alpha/beta/gamma/anyhing}
+## Solution: prefix=${PV%_*} suffix=${PV##*_}; PV=$prefix-$suffix
+
+## Workaround non-standart naming of upstream
+# Relevant https://archives.gentoo.org/gentoo-dev/message/a992cd7a6d2327ffafcfaa11ba4bbf4a
+# Relevant https://www.tldp.org/LDP/abs/html/string-manipulation.html !important
+##if [[ temporary="0" ]]; then
+##	prefix=${PV%_*} # Defines Version
+##	suffix=${PV##*_} # Defines 0.0_text
+##	version=$(PV##)
+##	MPV=$prefix-$suffix$version # MPV == My Package Version
+##	
+##	else
+##		MPV=${PV}
+##		# MPV == My Package Version
+##fi
+
+######## MPV=$(version_replace_separator )
+# 5  .  0  _  alpha  2
+# |	 |	|			
+# c1 s1	c2
+# 
+# "version_cut 2-4 1.2.3b_alpha4" would return "2.3b".
+# version_cut is useless 
+####
+# version_replace_separator 
+# replace_version_separator 3 - 1.2.3b" outputs "1.2.3-b
+# replace_version_sep 1 - 3 '~' 1.2.3b" would output "1-2.3~b"
+# 5.0_alpha2 -> 5.0-alpha.2 (I HATE MY LIIIFEEEEE)
+## Why can't they define something alike $PV_c1 which then i could just fetch into my var and spare my life 
+## WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+## Well i gues that i can just drop EAPI 7 and try to greb it using bash variable that i can manipulate instead.. 
+## NOOOOOOOOO HUG IT NOOOOOOOO I'M NOT DOING THAT NO! NO NO NO NO NO! NOOOOOOO!!!!
+
+# MY_PV=$(ver_rs 2 - 3 . )
+
+DESCRIPTION="Allows you to install and use non-native applications on your favorite operating system." # A short (not more than 80 characters) description of the package's purpose. Mandatory.
+
+HOMEPAGE="https://phoenicis.org/" #	Package's homepage. Mandatory (except for virtuals).
+
+#<01> i'd also suggest you read this https://dev.gentoo.org/~zmedico/portage/doc/man/ebuild.5.html -> done
+#<01> the parts about PV and version number specification
+#<01> !BASH_REMATCH
+#<greybot> The =~ operator of [[ evaluates the left hand string against the right hand extended regular expression (ERE). 
+## After a successful match, BASH_REMATCH can be used to expand matched groups from the pattern. Quoted parts of the regex become literal. 
+## To be safe & compatible, put the regex in a variable and do [[ $string =~ $regex ]]
+
+## <01> !guide > maybe at least take the time to read the guide
+## <greybot> maybe at least take the time to read the guide: <http://mywiki.wooledge.org/BashGuide>. PDF: <http://s.ntnu.no/bashguide.pdf>. Also lhunath's newer version (work in progress): <http://guide.bash.academy>
+
+if [[ PV == "9999" ]]; then
+	EGIT_REPO_URI="git@github.com:PhoenicisOrg/phoenicis.git"
+	EGIT_BRANCH="master"
+	inherit git-r3
+	SRC_URI=""
+	#KEYWORDS=""
+
+	elif [[ $PV =~ _(alpha|beta|gamma) ]]; then
+	    KEYWORDS="~amd64 ~x86"
+	    MPV=${PV//_"${BASH_REMATCH[1]}"/-"${BASH_REMATCH[1]}".}
+	    SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+
+	else
+		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${PV}.tar.gz"
+		MPV=${PV}
+
+fi
+
+
+#if [[ PV == "9999" ]]; then
+#	EGIT_REPO_URI="git@github.com:PhoenicisOrg/phoenicis.git"
+#	EGIT_BRANCH="master"
+#	inherit git-r3
+#	SRC_URI=""
+#	#KEYWORDS=""
+#
+#	elif [[ PV == [0-9].[0-9]_alpha[0-9] ]]; then
+#		KEYWORDS="~amd64 ~x86"
+#		MPV=${PV/_alpha/-alpha.}
+#		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+#
+#	elif [[ PV == [0-9].[0-9]_beta[0-9] ]]; then
+#		KEYWORDS="~amd64 ~x86"
+#		MPV=${PV/_beta/-beta.}
+#		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+#	elif [[ PV == [0-9].[0-9]_gamma[0-9] ]]; then
+#		KEYWORDS="~amd64 ~x86"
+#		MPV=${PV/_gamma/-gamma.}
+#		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+#
+#		# I hate you so much phoenics for doing this naming..
+#
+#	else 
+#		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${PV}.tar.gz"
+#		KEYWORDS="amd64 x86"
+#		die "it's grabbing the fucking else again"
+#
+#fi
+
+# SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v5.0-alpha.2.tar.gz" # TODO: fix naming.. >.<
+# SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz" # A list of source URIs for the package. Can contain USE-conditional parts - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#src_uri
+## source: https://github.com/PhoenicisOrg/phoenicis/archive/v5.0.0-alpha.1.tar.gz
+## `PV =="5.0.0-alpha"` is not sane -> 5.0.0_alpha is needed
+## source: https://github.com/PhoenicisOrg/phoenicis/archive/v5.0-alpha.2.tar.gz
+
+LICENSE="LGPL-3.0" # The package's license, corresponding exactly (including case) to a file in licenses/. Mandatory (except for virtuals) - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#license
+
+SLOT=${MPV} # The package's SLOT. Mandatory - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#slot
+
+# KEYWORDS="~amd64 ~x86" # https://devmanual.gentoo.org/ebuild-writing/variables/index.html#keywords
+## Testing since it's in alpha atm
+
+IUSE="" #	A list of all USE flags (excluding arch flags, but including USE_EXPAND flags) used within the ebuild - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#iuse.
+
+REQUIRED_USE="" # A list of assertions that must be met by the configuration of USE flags to be valid for this ebuild - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#required_use
+
+RESTRICT="" #	A space-delimited list of portage features to restrict. Valid values are fetch, mirror, strip, test and userpriv. See man 5 ebuild for details.
+
+DEBUGGING_DEPENDENCIES="
+	pastebin? (
+		>=app-text/wgetpaste-2.25-r3
+)"
+
+DEPENDENCIES="
+	java? (
+		>=dev-java/openjdk-bin-11_p28
+		>=dev-java/openjdk-11.0.1_p13
+)
+	>=dev-java/maven-bin-3.6.0
+	$DEBUGGING_DEPENDENCIES" # A list of the package's build dependencies - https://devmanual.gentoo.org/general-concepts/dependencies/index.html
+## Relevant https://github.com/PhoenicisOrg/phoenicis/issues/1694#issuecomment-450743692
+
+RUNTIME_DEPENDENDIES="
+	java? (
+		>=dev-java/openjdk-bin-11_p28
+		>=dev-java/openjdk-11.0.1_p13
+)" # https://devmanual.gentoo.org/general-concepts/dependencies/index.html
+
+POST_DEPENDENDANCIES="" # Use this only when RDEPEND would cause cyclic dependencies.
+
+# PROPERTIES="interactive"
+
+S="$WORKDIR/$PFN"
+
+JAZZHANDS () {
+# JAZZHANDS, Krey's version of gentoo's shorthand that MAKES SENCE
+## https://devmanual.gentoo.org/ebuild-writing/variables/
+
+#P=$PFN
+PFN=$PN-$MPV-${PR:+-$PR} # Expected $PN-$MPV if $PR=""
+## Package Full Name (Package, Version, Revision (if any)
+### Relevant: Parameter Expansion expands parameters: "$foo", "$1". You can use it to perform string or array operations: "${file%.mp3}", "${0##*/}", "${files[@]: -4}". They should *always* be quoted. See: http://mywiki.wooledge.org/BashFAQ/073 and "Parameter Expansion" in man bash. Also see http://wiki.bash-hackers.org/syntax/pe.
+
+CATEGORY=$PC 
+## Package Category
+
+PN=$PN
+## Package Name
+
+PV=$PV
+## Package Version
+
+PR=$PR
+## Package Revision
+
+PVR=$PVAR
+## Package Version And Revision
+
+PF=$PFN
+## Package Full Name
+
+
+PORTDIR=/var/tmp/portage
+## PORTage DIRectory
+
+PACKDIR=${PORTDIR}/${PC}/${PNAV}
+## PACKage DIRectory
+
+BUILDDIR=${PACKDIR}/build
+
+#FILESDIR=${PACKDIR}/files
+
+#WORKDIR=${PACKDIR}/work
+
+HOMEDIR=${PACKDIR}/homedir
+
+DISTDIR=${PACKDIR}/distdir
+
+IMAGEDIR=${PACKDIR}/image
+
+#SOURCEDIR=${PACKDIR}/${PNAV}
+
+
+
+BUILDDIR=$PBD
+## Package Build Directory
+
+# FILESDIR=$PFD
+## Package Files Directory
+
+# WORKDIR=$PWD
+## Package Work Directory
+
+HOMEDIR=$PHD
+## Package Home Directory
+
+DISTDIR=$PDD
+## Package Distribution Directory
+
+IMAGEDIR=$PID
+## Package Image Directory
+
+SOURCEDIR=$PSD
+## Package Source Directory
+
+ROOT=/ # I AM ROOT
+
+}
+
+# FUNCTIONS - https://devmanual.gentoo.org/ebuild-writing/functions/index.html
+
+report_source_not_found () {
+echo "Source wasn't detected
+
+PDD : ${PDD}
+$(ls $PDD)
+
+PHD : ${PHD}
+$(ls $PHD)
+
+PWD : ${PWD}
+$(ls $PWD)
+
+PBD : ${PBD}
+$(ls $PBD)
+
+PID : ${PID}
+$(ls $PID)
+"
+
+}
+
+disabled_pkg_pretend () { 
+# run sanity checks for a package during dependency calculation time
+
+	if use kernel_linux ; then
+		if [[ -e "${ROOT}"/usr/src/linux/.config ]] ; then
+			if kernel_is lt 2 6 30 ; then
+				CONFIG_CHECK="FUSE_FS"
+				ERROR_FUSE_FS="this is an unrealistic testcase..."
+				check_extra_config
+			fi
+		fi
+	fi
+}
+
+disabled_pkg_nofetch () {
+# Tell the user how to deal with fetch-restricted packages
+
+	[ -z "${SRC_URI}" ] && return
+
+	echo "!!! The following are listed in SRC_URI for ${PN}:"
+	for MYFILE in `echo ${SRC_URI}`; do
+		echo "!!!   $MYFILE"
+	done
+	return
+}
+
+pkg_setup () {
+# https://devmanual.gentoo.org/ebuild-writing/functions/pkg_setup/index.html
+	
+	JAZZHANDS # Triggers every gentoo developer since 2018, family company
+
+	echo "INFO: ebuild depends on app-text/wgetpaste for compilation, this is used for easier diagnostics in case of ebuild phase failure."
+	## TODO: Make INFO: in color 
+
+	if [[ -r $S/${PFN}/pom.xml ]]; then # TODO: NEEDS FIX
+		S="$S/${PFN}/"
+
+	else
+		die "
+!!! FATAL: Source wasn't found in $S, try:
+!!! a) Invoke 'emerge --sync' and re-emerge the package.
+!!! b) Remove '$PACKDIR' and re-emerge the package.
+
+If non above worked, file an issue in $LINK_ON_REPOSITORY with:
+
+$(echo "Source wasn't detected")
+
+PDD   : $PDD
+$(ls $PDD)
+
+PHD   : $PHD
+$(ls $PHD)
+
+PWD   : $PWD
+$(ls $PWD)
+
+PBD   : $PBD
+$(ls $PBD)
+
+PID   : $PID
+$(ls $PID)
+
+S     : $S
+$(ls $S)
+
+S/PFN : $S/$PFN
+$(ls $S/$PFN)
+
+" # TODO: Wasn't able to make it working on wgetpaste
+
+	fi
+
+}
+
+disabled_src_unpack () {
+# Extract source packages and do any necessary patching or fixes.
+
+	if [ "${A}" != "" ]; then
+		unpack ${A}
+	fi
+}
+
+disabled_src_prepare () {
+# Prepare source packages and do any necessary patching or fixes.
+
+	if declare -p PATCHES | grep -q "^declare -a "; then
+        [[ -n ${PATCHES[@]} ]] && eapply "${PATCHES[@]}"
+    else
+        [[ -n ${PATCHES} ]] && eapply ${PATCHES}
+    fi
+    eapply_user
+}
+
+disabled_src_configure () {
+# Configure the package.
+
+	if [[ -x ${ECONF_SOURCE:-.}/configure ]] ; then
+		econf
+	fi
+}
+
+src_compile () {
+# Configure and build the package.
+
+		if [[ -x $(command -v mvn) && -r $S/$PFN/pom.xml ]]; then
+			mvn clean package --quiet || die "
+!!! FATAL: Maven compilation failed.
+!!! Try invoking 'emerge --sync' and re-emerge the package.
+
+KNOWN ISSUES: 
+- Check your JAVA_HOME variable to make sure it points to correct java (Java 10+ required) - https://github.com/PhoenicisOrg/phoenicis/issues/1694#issuecomment-450957911
+if that didn't work file an issue in $LINK_ON_REPOSITORY with:
+
+Maven Compilation Failed
+emerge --info    : $(wgetpaste -c 'emerge --info' || echo 'Failed to fetch output emerge --info, please provide it manually.' )
+eix-installed -a : $(wgetpaste -c 'eix-installed -a' || echo 'eix-installed failed, please provide list of installed packages manually.')
+JAVA_HOME		 : $(echo $JAVA_HOME)
+"
+
+			else
+				die "
+!!! FATAL: Maven is not executable or $S/$PFN/pom.xml is not readable, unable to compile source!
+!!! Try invoking 'emerge --sync' and re-emerge the package if that didn't work file an issue in $LINK_ON_REPOSITORY with:
+
+Maven is not executable
+command -v mvn   : $(command -v mvn)
+emerge --info    : $(wgetpaste -c 'emerge --info' || echo 'Failed to fetch output emerge --info, please provide it manually.' )
+eix-installed -a : $(wgetpaste -c 'eix-installed -a' || echo 'eix-installed failed, please provide list of installed packages manually.')
+
+"
+		fi
+}
+
+disabled_src_test () {
+# Run pre-install test scripts
+
+	if emake check -n &> /dev/null; then
+		emake check
+	elif emake test -n &> /dev/null; then
+		emake test
+	fi
+}
+
+disabled_src_install () {
+# Install a package to ${IMAGEDIR}
+
+	if [[ -x $(command -v mvn) ]]; then
+
+		cd $S/$PFN || die "Unable to cd in $S/$PFN."
+
+		# TODO: Check if package is compiled.
+		mvn install || die "Maven was unable to install $PFN" # TODO: Test if fail triggers die
+
+	fi
+
+}
+
+disabled_pkg_preinstall () {
+# Called before image is installed to ${ROOT}
+
+	enewgroup foo
+	enewuser foo -1 /bin/false /dev/null foo
+}
+
+pkg_postinst () {
+# Called after image is installed to ${ROOT}
+
+	mv $S/$PFN/phoenicis-javafx $PID/opt/phoenicis-$MPV || die "Unable to mv $S/$PFN/phoenicis-javafx /opt/phoenicis-$MPV, Maven installation failed and didn't trigger an error in src_install phawe? Try to invoke it yourself."
+
+		if [[ ! -x /usr/bin/phoenicis-$MPV ]]; then
+			echo "#!/bin/bash
+cd /opt/phoenicis && mvn exec:java /opt/phoenicis-$MPV || echo 'Unable to execute phoenicis-$MPV' " >> $PID/usr/bin/phoenicis-$MPV && chmod +x $PID/usr/bin/phoenicis-$MPV || die "Unable to make a shortcut in /usr/bin/phoenicis-$MPV and give it executable permission. Try invoking 'echo "#!/bin/bash
+cd /opt/phoenicis && mvn exec:java /opt/phoenicis-$MPV || echo 'Unable to execute phoenicis-$MPV' " >> /usr/bin/phoenicis-$MPV && chmod +x /usr/bin/phoenicis-$MPV' yourself.."
+		fi
+
+}
+
+disabled_pkg_prerm () {
+# Called before a package is unmerged
+
+	return
+}
+
+disabled_pkg_postrm () {
+# Called after image is installed to ${ROOT}
+
+	return
+}
+
+disabled_pkg_config () {
+# Run any special post-install configuration
+
+	eerror "This ebuild does not have a config function."
+	return 
+}
+
+disabled_pkg_info () {
+# display information about a package
+
+	return
+}

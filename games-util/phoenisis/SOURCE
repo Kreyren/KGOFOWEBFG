@@ -49,7 +49,10 @@
 
 # MY_PV=$(ver_rs 2 - 3 . )
 
-EAPI=7
+EAPI=6
+## java-vm-2 doesn't support EAPI=7
+
+inherit java-vm-2
 
 LINK_ON_REPOSITORY="github.com/Kreyren/KGOFOWEBFG"
 
@@ -79,7 +82,6 @@ if [[ $PV == "9999" ]]; then
 		MPV=${PV/"_${BASH_REMATCH[1]}"/-"${BASH_REMATCH[1]}".}
 	    SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
 	   	KEYWORDS="~amd64 ~x86"
-	    echo $MPV
 
 	elif [[ $PV == @([0-9].[0-9]-rc[0-9]|[0-9].[0-9]) ]]; then
 		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${PVR}.tar.gz"
@@ -154,7 +156,7 @@ DEPEND="
 ## Relevant https://github.com/PhoenicisOrg/phoenicis/issues/1694#issuecomment-450743692
 
 RDEPEND="
-	java? (
+	|| (
 		>=dev-java/openjdk-bin-11_p28
 		>=dev-java/openjdk-11.0.1_p13
 )" # https://devmanual.gentoo.org/general-concepts/dependencies/index.html
@@ -162,6 +164,8 @@ RDEPEND="
 PDEPEND="" # Use this only when RDEPEND would cause cyclic dependencies.
 
 PROPERTIES="interactive"
+
+S=${WORKDIR}
 
 JAZZHANDS () {
 # JAZZHANDS, Krey's version of gentoo's shorthand that MAKES SENCE
@@ -222,6 +226,9 @@ IMAGEDIR=${PACKDIR}/image
 
 ROOT=/ # I AM ROOT
 
+# Modified Package Full Name
+MPFN=$PN-$MPV
+
 }
 
 # FUNCTIONS - https://devmanual.gentoo.org/ebuild-writing/functions/index.html
@@ -259,12 +266,12 @@ pkg_setup () {
 
 	echo ">>> This ebuild depends on app-text/wgetpaste for compilation, this is used for easier diagnostics in case of ebuild phase failure."
 
-	SOURCEDIR=${WORKDIR}
-
-	while [[ JAVA_HOME == "" && ! -e JAVA_HOME/release ]]; do
+	while [[ JAVA_HOME == "" && ! -e $JAVA_HOME/release ]]; do
 		echo "!!! FATAL: JAVA_HOME is invalid, expected JAVA_HOME pointing to valid java directory, please input it manually:"
 		read -p JAVA_HOME{=,}
 	done
+
+	JAVA_HOME=/usr/lib64/openjdk-11
 
 }
 
@@ -300,16 +307,19 @@ disabled_src_configure () {
 src_compile () {
 # Configure and build the package.
 
-		if [[ -x $(command -v mvn) && -r $PWD/$PFN/pom.xml ]]; then
-			mvn clean package --quiet || die "
+## TODO: FAILING https://paste.pound-python.org/show/yAG661zxay1qrHJGB40x/
+
+		if [[ -x $(command -v mvn) && -r $PWD/$MPFN/pom.xml ]]; then
+			cd $PWD/$MPFN && mvn clean package --quiet || die "
 !!! FATAL: Maven compilation failed.
 !!! Try invoking 'emerge --sync' and re-emerge the package.
 
 >>> If that didn't work file an issue to upstream on $LINK_ON_REPOSITORY with:
 $([ ! -x $(command -v mvn) ] && echo '!!! FATAL: Maven is not executable!')$([ -x $(command -v mvn) ] && echo '>>> Maven is executable.')
-$([ ! -r $PWD/$PFN/pom.xml ] && echo '!!! FATAL: $PWD/$PFN/pom.xml is not readable!')$([ -r $PWD/$PFN/pom.xml ] && echo '>>> $PWD/$PFN/pom.xml is readable.')
+$([ ! -r $PWD/$MPFN/pom.xml ] && echo '!!! FATAL: '$PWD/$MPFN/pom.xml' is not readable!')$([ -r $PWD/$MPFN/pom.xml ] && echo '>>> '$PWD/$MPFN/pom.xml' is readable.')
 emerge --info : $(wgetpaste -c 'emerge --info' || echo "!!! Unable to fetch output of emerge --info, please provide it manually.")
-JAVA_HOME     : $JAVA_HOME"
+JAVA_HOME     : $JAVA_HOME
+pwd           : '$(pwd)'"
 
 			else
 				 die "
@@ -318,9 +328,10 @@ JAVA_HOME     : $JAVA_HOME"
 
 >>> If that didn't work file an issue to upstream on $LINK_ON_REPOSITORY with:
 $([ ! -x $(command -v mvn) ] && echo '!!! FATAL: Maven is not executable!')$([ -x $(command -v mvn) ] && echo '>>> Maven is executable.')
-$([ ! -r $PWD/$PFN/pom.xml ] && echo '!!! FATAL: $PWD/$PFN/pom.xml is not readable!')$([ -r $PWD/$PFN/pom.xml ] && echo '>>> $PWD/$PFN/pom.xml is readable.')
+$([ ! -r $PWD/$MPFN/pom.xml ] && echo '!!! FATAL: "$PWD/$MPFN/pom.xml" is not readable!')$([ -r $PWD/$MPFN/pom.xml ] && echo '>>> "$PWD/$MPFN/pom.xml" is readable.')
 emerge --info : $(wgetpaste -c 'emerge --info' || echo "!!! Unable to fetch output of emerge --info, please provide it manually.")
-JAVA_HOME     : $JAVA_HOME"
+JAVA_HOME     : $JAVA_HOME
+pwd           : '$(pwd)'"
 
 		fi
 }
@@ -340,10 +351,10 @@ src_install () {
 
 	if [[ -x $(command -v mvn) ]]; then
 
-		cd $PWD/$PFN || die "Unable to cd in $PWD/$PFN."
+		cd $PWD/$MPFN || die "Unable to cd in $PWD/$MPFN."
 
 		# TODO: Check if package is compiled.
-		mvn install || die "Maven was unable to install $PFN, try invoke it manually in $PWD/$PFN/phoenicis-javafx" # TODO: Test if fail triggers die
+		mvn install || die "Maven was unable to install $MPFN, try invoke it manually in $PWD/$PFN/phoenicis-javafx" # TODO: Test if fail triggers die
 
 	fi
 

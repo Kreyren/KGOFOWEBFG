@@ -2,10 +2,6 @@
 # Based on master index https://devmanual.gentoo.org/
 # Disclaimer: This ebuild is source to be translated into a gentoo's code ethigues
 
-EAPI=7
-
-LINK_ON_REPOSITORY="github.com/Kreyren/Phoenicis-Overlay"
-
 # TEST1_TEST2 - VAR MANIPULATION (http://wiki.bash-hackers.org/syntax/pe)
 ## %_TEST2 -> TEST2
 ## ##TEST2 -> TEST1
@@ -16,11 +12,6 @@ LINK_ON_REPOSITORY="github.com/Kreyren/Phoenicis-Overlay"
 ## <01> kreyren: also ...
 ## <01> !caps > kreyren
 ## <greybot> kreyren: By convention, environment variables (PATH, EDITOR, SHELL, ...) and internal shell variables (BASH_VERSION, RANDOM, ...) are fully capitalized. All other variable names should be lowercase. Since variable names are case-sensitive, this convention avoids accidentally overriding environmental and internal variables.
-
-## OVERRIDES
-DEPEND=$DEPENDENCIES 
-RDEPEND=$RUNTIME_DEPENDENDIES
-PDEPEND=$POST_DEPENDENDANCIES
 
 # Assuming that PV==<NUM>.<NUM>_{alpha/beta/gamma/anyhing}
 ## Solution: prefix=${PV%_*} suffix=${PV##*_}; PV=$prefix-$suffix
@@ -58,6 +49,10 @@ PDEPEND=$POST_DEPENDENDANCIES
 
 # MY_PV=$(ver_rs 2 - 3 . )
 
+EAPI=7
+
+LINK_ON_REPOSITORY="github.com/Kreyren/KGOFOWEBFG"
+
 DESCRIPTION="Allows you to install and use non-native applications on your favorite operating system." # A short (not more than 80 characters) description of the package's purpose. Mandatory.
 
 HOMEPAGE="https://phoenicis.org/" #	Package's homepage. Mandatory (except for virtuals).
@@ -72,25 +67,34 @@ HOMEPAGE="https://phoenicis.org/" #	Package's homepage. Mandatory (except for vi
 ## <01> !guide > maybe at least take the time to read the guide
 ## <greybot> maybe at least take the time to read the guide: <http://mywiki.wooledge.org/BashGuide>. PDF: <http://s.ntnu.no/bashguide.pdf>. Also lhunath's newer version (work in progress): <http://guide.bash.academy>
 
-if [[ PV == "9999" ]]; then
+if [[ $PV == "9999" ]]; then
 	EGIT_REPO_URI="git@github.com:PhoenicisOrg/phoenicis.git"
 	EGIT_BRANCH="master"
+	MPV=${PVR}
 	inherit git-r3
-	SRC_URI=""
-	#KEYWORDS=""
+	unset SRC_URI
+	unset KEYWORDS	
 
 	elif [[ $PV =~ _(alpha|beta|gamma) ]]; then
-	    KEYWORDS="~amd64 ~x86"
-	    MPV=${PV//_"${BASH_REMATCH[1]}"/-"${BASH_REMATCH[1]}".}
+		MPV=${PV/"_${BASH_REMATCH[1]}"/-"${BASH_REMATCH[1]}".}
 	    SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+	   	KEYWORDS="~amd64 ~x86"
+	    echo $MPV
 
-	else
-		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${PV}.tar.gz"
-		MPV=${PV}
+	elif [[ $PV == @([0-9].[0-9]-rc[0-9]|[0-9].[0-9]) ]]; then
+		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${PVR}.tar.gz"
+		KEYWORDS="amd64 x86"
+		MPV=${PVR}
+
+	else 
+		die "This file version is not supported by this ebuild, please issue an issue on $LINK_ON_REPOSITORY with:
+
+Unsupported file version
+- FPN : $P"
 
 fi
 
-
+### ALTERNATIVE
 #if [[ PV == "9999" ]]; then
 #	EGIT_REPO_URI="git@github.com:PhoenicisOrg/phoenicis.git"
 #	EGIT_BRANCH="master"
@@ -140,129 +144,87 @@ REQUIRED_USE="" # A list of assertions that must be met by the configuration of 
 
 RESTRICT="" #	A space-delimited list of portage features to restrict. Valid values are fetch, mirror, strip, test and userpriv. See man 5 ebuild for details.
 
-DEBUGGING_DEPENDENCIES="
-	pastebin? (
-		>=app-text/wgetpaste-2.25-r3
-)"
-
-DEPENDENCIES="
-	java? (
+DEPEND="
+	|| (
 		>=dev-java/openjdk-bin-11_p28
 		>=dev-java/openjdk-11.0.1_p13
 )
 	>=dev-java/maven-bin-3.6.0
-	$DEBUGGING_DEPENDENCIES" # A list of the package's build dependencies - https://devmanual.gentoo.org/general-concepts/dependencies/index.html
+" # A list of the package's build dependencies - https://devmanual.gentoo.org/general-concepts/dependencies/index.html
 ## Relevant https://github.com/PhoenicisOrg/phoenicis/issues/1694#issuecomment-450743692
 
-RUNTIME_DEPENDENDIES="
+RDEPEND="
 	java? (
 		>=dev-java/openjdk-bin-11_p28
 		>=dev-java/openjdk-11.0.1_p13
 )" # https://devmanual.gentoo.org/general-concepts/dependencies/index.html
 
-POST_DEPENDENDANCIES="" # Use this only when RDEPEND would cause cyclic dependencies.
+PDEPEND="" # Use this only when RDEPEND would cause cyclic dependencies.
 
-# PROPERTIES="interactive"
-
-S="$WORKDIR/$PFN"
+PROPERTIES="interactive"
 
 JAZZHANDS () {
 # JAZZHANDS, Krey's version of gentoo's shorthand that MAKES SENCE
 ## https://devmanual.gentoo.org/ebuild-writing/variables/
 
-#P=$PFN
-PFN=$PN-$MPV-${PR:+-$PR} # Expected $PN-$MPV if $PR=""
-## Package Full Name (Package, Version, Revision (if any)
+# Package Full Name (Package, Version, Revision (if any)
 ### Relevant: Parameter Expansion expands parameters: "$foo", "$1". You can use it to perform string or array operations: "${file%.mp3}", "${0##*/}", "${files[@]: -4}". They should *always* be quoted. See: http://mywiki.wooledge.org/BashFAQ/073 and "Parameter Expansion" in man bash. Also see http://wiki.bash-hackers.org/syntax/pe.
+PFN=$PN-$MPV-${PR:+-$PR} # Expected $PN-$MPV if $PR=""
 
-CATEGORY=$PC 
-## Package Category
+# Package Category
+PC=${CATEGORY} 
 
+# Package Name
 PN=$PN
-## Package Name
 
+# Package Version
 PV=$PV
-## Package Version
 
+# Package Revision
 PR=$PR
-## Package Revision
 
-PVR=$PVAR
 ## Package Version And Revision
+PVAR=${PVR}
 
+# Package Full Name
 PF=$PFN
-## Package Full Name
 
-
+# PORTage DIRectory
 PORTDIR=/var/tmp/portage
-## PORTage DIRectory
+	PD=${PORTDIR}
 
+
+# PACKage DIRectory
 PACKDIR=${PORTDIR}/${PC}/${PNAV}
-## PACKage DIRectory
+	PDD=${PACKDIR}
 
+# Package Build Directory
 BUILDDIR=${PACKDIR}/build
+	PBD=${BUILDDIR}
 
-#FILESDIR=${PACKDIR}/files
+#FILESDIR=${PACKDIR}/files - Causes readonly
+	PFD=${FILESDIR}
 
-#WORKDIR=${PACKDIR}/work
+#WORKDIR=${PACKDIR}/work - Causes readonly
+	PWD=${WORKDIR}
 
 HOMEDIR=${PACKDIR}/homedir
+	PHD=${HOMEDIR}
 
 DISTDIR=${PACKDIR}/distdir
+	PDD=${DISTDIR}
 
 IMAGEDIR=${PACKDIR}/image
+	PID=${IMAGEDIR}
 
-#SOURCEDIR=${PACKDIR}/${PNAV}
-
-
-
-BUILDDIR=$PBD
-## Package Build Directory
-
-# FILESDIR=$PFD
-## Package Files Directory
-
-# WORKDIR=$PWD
-## Package Work Directory
-
-HOMEDIR=$PHD
-## Package Home Directory
-
-DISTDIR=$PDD
-## Package Distribution Directory
-
-IMAGEDIR=$PID
-## Package Image Directory
-
-SOURCEDIR=$PSD
-## Package Source Directory
+#SOURCEDIR=${PACKDIR}/${PNAV} - Causes readonly
+	PSD=${SOURCEDIR}
 
 ROOT=/ # I AM ROOT
 
 }
 
 # FUNCTIONS - https://devmanual.gentoo.org/ebuild-writing/functions/index.html
-
-report_source_not_found () {
-echo "Source wasn't detected
-
-PDD : ${PDD}
-$(ls $PDD)
-
-PHD : ${PHD}
-$(ls $PHD)
-
-PWD : ${PWD}
-$(ls $PWD)
-
-PBD : ${PBD}
-$(ls $PBD)
-
-PID : ${PID}
-$(ls $PID)
-"
-
-}
 
 disabled_pkg_pretend () { 
 # run sanity checks for a package during dependency calculation time
@@ -295,51 +257,21 @@ pkg_setup () {
 	
 	JAZZHANDS # Triggers every gentoo developer since 2018, family company
 
-	echo "INFO: ebuild depends on app-text/wgetpaste for compilation, this is used for easier diagnostics in case of ebuild phase failure."
-	## TODO: Make INFO: in color 
+	echo ">>> This ebuild depends on app-text/wgetpaste for compilation, this is used for easier diagnostics in case of ebuild phase failure."
 
-	if [[ -r $S/${PFN}/pom.xml ]]; then # TODO: NEEDS FIX
-		S="$S/${PFN}/"
+	SOURCEDIR=${WORKDIR}
 
-	else
-		die "
-!!! FATAL: Source wasn't found in $S, try:
-!!! a) Invoke 'emerge --sync' and re-emerge the package.
-!!! b) Remove '$PACKDIR' and re-emerge the package.
-
-If non above worked, file an issue in $LINK_ON_REPOSITORY with:
-
-$(echo "Source wasn't detected")
-
-PDD   : $PDD
-$(ls $PDD)
-
-PHD   : $PHD
-$(ls $PHD)
-
-PWD   : $PWD
-$(ls $PWD)
-
-PBD   : $PBD
-$(ls $PBD)
-
-PID   : $PID
-$(ls $PID)
-
-S     : $S
-$(ls $S)
-
-S/PFN : $S/$PFN
-$(ls $S/$PFN)
-
-" # TODO: Wasn't able to make it working on wgetpaste
-
-	fi
+	while [[ JAVA_HOME == "" && ! -e JAVA_HOME/release ]]; do
+		echo "!!! FATAL: JAVA_HOME is invalid, expected JAVA_HOME pointing to valid java directory, please input it manually:"
+		read -p JAVA_HOME{=,}
+	done
 
 }
 
-disabled_src_unpack () {
+src_unpack () {
 # Extract source packages and do any necessary patching or fixes.
+
+	# Needs kreyrenization
 
 	if [ "${A}" != "" ]; then
 		unpack ${A}
@@ -368,32 +300,28 @@ disabled_src_configure () {
 src_compile () {
 # Configure and build the package.
 
-		if [[ -x $(command -v mvn) && -r $S/$PFN/pom.xml ]]; then
+		if [[ -x $(command -v mvn) && -r $PWD/$PFN/pom.xml ]]; then
 			mvn clean package --quiet || die "
 !!! FATAL: Maven compilation failed.
 !!! Try invoking 'emerge --sync' and re-emerge the package.
 
-KNOWN ISSUES: 
-- Check your JAVA_HOME variable to make sure it points to correct java (Java 10+ required) - https://github.com/PhoenicisOrg/phoenicis/issues/1694#issuecomment-450957911
-if that didn't work file an issue in $LINK_ON_REPOSITORY with:
-
-Maven Compilation Failed
-emerge --info    : $(wgetpaste -c 'emerge --info' || echo 'Failed to fetch output emerge --info, please provide it manually.' )
-eix-installed -a : $(wgetpaste -c 'eix-installed -a' || echo 'eix-installed failed, please provide list of installed packages manually.')
-JAVA_HOME		 : $(echo $JAVA_HOME)
-"
+>>> If that didn't work file an issue to upstream on $LINK_ON_REPOSITORY with:
+$([ ! -x $(command -v mvn) ] && echo '!!! FATAL: Maven is not executable!')$([ -x $(command -v mvn) ] && echo '>>> Maven is executable.')
+$([ ! -r $PWD/$PFN/pom.xml ] && echo '!!! FATAL: $PWD/$PFN/pom.xml is not readable!')$([ -r $PWD/$PFN/pom.xml ] && echo '>>> $PWD/$PFN/pom.xml is readable.')
+emerge --info : $(wgetpaste -c 'emerge --info' || echo "!!! Unable to fetch output of emerge --info, please provide it manually.")
+JAVA_HOME     : $JAVA_HOME"
 
 			else
-				die "
-!!! FATAL: Maven is not executable or $S/$PFN/pom.xml is not readable, unable to compile source!
-!!! Try invoking 'emerge --sync' and re-emerge the package if that didn't work file an issue in $LINK_ON_REPOSITORY with:
+				 die "
+!!! FATAL: Maven is not executable or $PWD/$PFN/pom.xml is not readable.
+!!! Try invoking 'emerge --sync' and re-emerge the package.
 
-Maven is not executable
-command -v mvn   : $(command -v mvn)
-emerge --info    : $(wgetpaste -c 'emerge --info' || echo 'Failed to fetch output emerge --info, please provide it manually.' )
-eix-installed -a : $(wgetpaste -c 'eix-installed -a' || echo 'eix-installed failed, please provide list of installed packages manually.')
+>>> If that didn't work file an issue to upstream on $LINK_ON_REPOSITORY with:
+$([ ! -x $(command -v mvn) ] && echo '!!! FATAL: Maven is not executable!')$([ -x $(command -v mvn) ] && echo '>>> Maven is executable.')
+$([ ! -r $PWD/$PFN/pom.xml ] && echo '!!! FATAL: $PWD/$PFN/pom.xml is not readable!')$([ -r $PWD/$PFN/pom.xml ] && echo '>>> $PWD/$PFN/pom.xml is readable.')
+emerge --info : $(wgetpaste -c 'emerge --info' || echo "!!! Unable to fetch output of emerge --info, please provide it manually.")
+JAVA_HOME     : $JAVA_HOME"
 
-"
 		fi
 }
 
@@ -407,17 +335,19 @@ disabled_src_test () {
 	fi
 }
 
-disabled_src_install () {
-# Install a package to ${IMAGEDIR}
+src_install () {
+# Install a package to ${IMAGEDIR} from which it will be extracted to live system
 
 	if [[ -x $(command -v mvn) ]]; then
 
-		cd $S/$PFN || die "Unable to cd in $S/$PFN."
+		cd $PWD/$PFN || die "Unable to cd in $PWD/$PFN."
 
 		# TODO: Check if package is compiled.
-		mvn install || die "Maven was unable to install $PFN" # TODO: Test if fail triggers die
+		mvn install || die "Maven was unable to install $PFN, try invoke it manually in $PWD/$PFN/phoenicis-javafx" # TODO: Test if fail triggers die
 
 	fi
+
+	## No need to overengineer src_install since the change of it failing is practically impossible.
 
 }
 
@@ -431,12 +361,12 @@ disabled_pkg_preinstall () {
 pkg_postinst () {
 # Called after image is installed to ${ROOT}
 
-	mv $S/$PFN/phoenicis-javafx $PID/opt/phoenicis-$MPV || die "Unable to mv $S/$PFN/phoenicis-javafx /opt/phoenicis-$MPV, Maven installation failed and didn't trigger an error in src_install phawe? Try to invoke it yourself."
+	mv $PWD/$PFN/phoenicis-javafx $PID/opt/phoenicis-$MPV || die "Unable to mv $PWD/$PFN/phoenicis-javafx /opt/phoenicis-$MPV."
 
 		if [[ ! -x /usr/bin/phoenicis-$MPV ]]; then
 			echo "#!/bin/bash
-cd /opt/phoenicis && mvn exec:java /opt/phoenicis-$MPV || echo 'Unable to execute phoenicis-$MPV' " >> $PID/usr/bin/phoenicis-$MPV && chmod +x $PID/usr/bin/phoenicis-$MPV || die "Unable to make a shortcut in /usr/bin/phoenicis-$MPV and give it executable permission. Try invoking 'echo "#!/bin/bash
-cd /opt/phoenicis && mvn exec:java /opt/phoenicis-$MPV || echo 'Unable to execute phoenicis-$MPV' " >> /usr/bin/phoenicis-$MPV && chmod +x /usr/bin/phoenicis-$MPV' yourself.."
+cd /opt/phoenicis && mvn exec:java /opt/phoenicis-$MPV || echo 'Unable to execute phoenicis-$MPV' " >> $PID/usr/bin/phoenicis-$MPV || die "Unable to create a shotcut."
+			chmod +x /usr/bin/phoenicis-$MPV || die "Unable to set executable permission on shortcut in /usr/bin/phoenici-$MPV"
 		fi
 
 }

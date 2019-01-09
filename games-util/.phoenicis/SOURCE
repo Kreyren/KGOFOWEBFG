@@ -1,0 +1,344 @@
+# Distributed under the terms of the GNU General Public License v2
+# Based on master index https://devmanual.gentoo.org/
+# Disclaimer: This ebuild is source to be translated into a gentoo's code ethigues
+
+# TEST1_TEST2 - VAR MANIPULATION (http://wiki.bash-hackers.org/syntax/pe)
+## %_TEST2 -> TEST2
+## ##TEST2 -> TEST1
+
+# PN=foo MPV=bar; echo "$PN-$MPV${PR:+-$PR}"; PR=baz; echo "$PN-$MPV${PR:+-$PR}";
+## <shbot> pj: foo-bar
+## <shbot> pj: foo-bar-baz
+## <01> kreyren: also ...
+## <01> !caps > kreyren
+## <greybot> kreyren: By convention, environment variables (PATH, EDITOR, SHELL, ...) and internal shell variables (BASH_VERSION, RANDOM, ...) are fully capitalized. All other variable names should be lowercase. Since variable names are case-sensitive, this convention avoids accidentally overriding environmental and internal variables.
+
+# Assuming that PV==<NUM>.<NUM>_{alpha/beta/gamma/anyhing}
+## Solution: prefix=${PV%_*} suffix=${PV##*_}; PV=$prefix-$suffix
+
+## Workaround non-standart naming of upstream
+# Relevant https://archives.gentoo.org/gentoo-dev/message/a992cd7a6d2327ffafcfaa11ba4bbf4a
+# Relevant https://www.tldp.org/LDP/abs/html/string-manipulation.html !important
+##if [[ temporary="0" ]]; then
+##	prefix=${PV%_*} # Defines Version
+##	suffix=${PV##*_} # Defines 0.0_text
+##	version=$(PV##)
+##	MPV=$prefix-$suffix$version # MPV == My Package Version
+##	
+##	else
+##		MPV=${PV}
+##		# MPV == My Package Version
+##fi
+
+######## MPV=$(version_replace_separator )
+# 5  .  0  _  alpha  2
+# |	 |	|			
+# c1 s1	c2
+# 
+# "version_cut 2-4 1.2.3b_alpha4" would return "2.3b".
+# version_cut is useless 
+####
+# version_replace_separator 
+# replace_version_separator 3 - 1.2.3b" outputs "1.2.3-b
+# replace_version_sep 1 - 3 '~' 1.2.3b" would output "1-2.3~b"
+# 5.0_alpha2 -> 5.0-alpha.2 (I HATE MY LIIIFEEEEE)
+## Why can't they define something alike $PV_c1 which then i could just fetch into my var and spare my life 
+## WHYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+## Well i gues that i can just drop EAPI 7 and try to greb it using bash variable that i can manipulate instead.. 
+## NOOOOOOOOO HUG IT NOOOOOOOO I'M NOT DOING THAT NO! NO NO NO NO NO! NOOOOOOO!!!!
+
+# MY_PV=$(ver_rs 2 - 3 . )
+
+EAPI=6
+## java-vm-2 doesn't support EAPI=7
+
+inherit java-vm-2 jazzhands 
+
+LINK_ON_REPOSITORY="github.com/Kreyren/KGOFOWEBFG"
+
+DESCRIPTION="Allows you to install and use non-native applications on your favorite operating system." # A short (not more than 80 characters) description of the package's purpose. Mandatory.
+
+HOMEPAGE="https://phoenicis.org/" #	Package's homepage. Mandatory (except for virtuals).
+
+#<01> i'd also suggest you read this https://dev.gentoo.org/~zmedico/portage/doc/man/ebuild.5.html -> done
+#<01> the parts about PV and version number specification
+#<01> !BASH_REMATCH
+#<greybot> The =~ operator of [[ evaluates the left hand string against the right hand extended regular expression (ERE). 
+## After a successful match, BASH_REMATCH can be used to expand matched groups from the pattern. Quoted parts of the regex become literal. 
+## To be safe & compatible, put the regex in a variable and do [[ $string =~ $regex ]]
+
+## <01> !guide > maybe at least take the time to read the guide
+## <greybot> maybe at least take the time to read the guide: <http://mywiki.wooledge.org/BashGuide>. PDF: <http://s.ntnu.no/bashguide.pdf>. Also lhunath's newer version (work in progress): <http://guide.bash.academy>
+
+if [[ $PV == "9999" ]]; then
+	EGIT_REPO_URI="git@github.com:PhoenicisOrg/phoenicis.git"
+	EGIT_BRANCH="master"
+	MPV=${PVR}
+	inherit git-r3
+	unset SRC_URI
+	unset KEYWORDS	
+
+	elif [[ $PV =~ _(alpha|beta|gamma) ]]; then
+		MPV=${PV/"_${BASH_REMATCH[1]}"/-"${BASH_REMATCH[1]}".}
+	    SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+	   	KEYWORDS="~amd64 ~x86"
+
+	elif [[ $PV == @([0-9].[0-9]-rc[0-9]|[0-9].[0-9]) ]]; then
+		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${PVR}.tar.gz"
+		KEYWORDS="amd64 x86"
+		MPV=${PVR}
+
+	else 
+		die "This file version is not supported by this ebuild, please issue an issue on $LINK_ON_REPOSITORY with:
+
+Unsupported file version
+- FPN : $P"
+
+fi
+
+### ALTERNATIVE
+#if [[ PV == "9999" ]]; then
+#	EGIT_REPO_URI="git@github.com:PhoenicisOrg/phoenicis.git"
+#	EGIT_BRANCH="master"
+#	inherit git-r3
+#	SRC_URI=""
+#	#KEYWORDS=""
+#
+#	elif [[ PV == [0-9].[0-9]_alpha[0-9] ]]; then
+#		KEYWORDS="~amd64 ~x86"
+#		MPV=${PV/_alpha/-alpha.}
+#		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+#
+#	elif [[ PV == [0-9].[0-9]_beta[0-9] ]]; then
+#		KEYWORDS="~amd64 ~x86"
+#		MPV=${PV/_beta/-beta.}
+#		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+#	elif [[ PV == [0-9].[0-9]_gamma[0-9] ]]; then
+#		KEYWORDS="~amd64 ~x86"
+#		MPV=${PV/_gamma/-gamma.}
+#		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz"
+#
+#		# I hate you so much phoenics for doing this naming..
+#
+#	else 
+#		SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${PV}.tar.gz"
+#		KEYWORDS="amd64 x86"
+#		die "it's grabbing the fucking else again"
+#
+#fi
+
+# SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v5.0-alpha.2.tar.gz" # TODO: fix naming.. >.<
+# SRC_URI="https://github.com/PhoenicisOrg/phoenicis/archive/v${MPV}.tar.gz" # A list of source URIs for the package. Can contain USE-conditional parts - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#src_uri
+## source: https://github.com/PhoenicisOrg/phoenicis/archive/v5.0.0-alpha.1.tar.gz
+## `PV =="5.0.0-alpha"` is not sane -> 5.0.0_alpha is needed
+## source: https://github.com/PhoenicisOrg/phoenicis/archive/v5.0-alpha.2.tar.gz
+
+LICENSE="LGPL-3.0" # The package's license, corresponding exactly (including case) to a file in licenses/. Mandatory (except for virtuals) - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#license
+
+SLOT=${MPV} # The package's SLOT. Mandatory - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#slot
+
+# KEYWORDS="~amd64 ~x86" # https://devmanual.gentoo.org/ebuild-writing/variables/index.html#keywords
+## Testing since it's in alpha atm
+
+IUSE="" #	A list of all USE flags (excluding arch flags, but including USE_EXPAND flags) used within the ebuild - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#iuse.
+
+REQUIRED_USE="" # A list of assertions that must be met by the configuration of USE flags to be valid for this ebuild - https://devmanual.gentoo.org/ebuild-writing/variables/index.html#required_use
+
+RESTRICT="" #	A space-delimited list of portage features to restrict. Valid values are fetch, mirror, strip, test and userpriv. See man 5 ebuild for details.
+
+DEPEND="
+	|| (
+		>=dev-java/openjdk-bin-11_p28
+		>=dev-java/openjdk-11.0.1_p13
+)
+	>=dev-java/maven-bin-3.6.0
+" # A list of the package's build dependencies - https://devmanual.gentoo.org/general-concepts/dependencies/index.html
+## Relevant https://github.com/PhoenicisOrg/phoenicis/issues/1694#issuecomment-450743692
+
+RDEPEND="
+	|| (
+		>=dev-java/openjdk-bin-11_p28
+		>=dev-java/openjdk-11.0.1_p13
+)" # https://devmanual.gentoo.org/general-concepts/dependencies/index.html
+
+PDEPEND="" # Use this only when RDEPEND would cause cyclic dependencies.
+
+PROPERTIES="interactive"
+
+S=${WORKDIR}
+
+# FUNCTIONS - https://devmanual.gentoo.org/ebuild-writing/functions/index.html
+
+disabled_pkg_pretend () { 
+# run sanity checks for a package during dependency calculation time
+
+	if use kernel_linux ; then
+		if [[ -e "${ROOT}"/usr/src/linux/.config ]] ; then
+			if kernel_is lt 2 6 30 ; then
+				CONFIG_CHECK="FUSE_FS"
+				ERROR_FUSE_FS="this is an unrealistic testcase..."
+				check_extra_config
+			fi
+		fi
+	fi
+}
+
+disabled_pkg_nofetch () {
+# Tell the user how to deal with fetch-restricted packages
+
+	[ -z "${SRC_URI}" ] && return
+
+	echo "!!! The following are listed in SRC_URI for ${PN}:"
+	for MYFILE in `echo ${SRC_URI}`; do
+		echo "!!!   $MYFILE"
+	done
+	return
+}
+
+pkg_setup () {
+# https://devmanual.gentoo.org/ebuild-writing/functions/pkg_setup/index.html
+	
+	JAZZHANDS # Triggers every gentoo developer since 2018, family company
+
+	echo ">>> This ebuild depends on app-text/wgetpaste for compilation, this is used for easier diagnostics in case of ebuild phase failure."
+
+	while [[ JAVA_HOME == "" && ! -e $JAVA_HOME/release ]]; do
+		echo "!!! FATAL: JAVA_HOME is invalid, expected JAVA_HOME pointing to valid java directory, please input it manually:"
+		read -p JAVA_HOME{=,}
+	done
+
+	JAVA_HOME=/usr/lib64/openjdk-11
+
+}
+
+src_unpack () {
+# Extract source packages and do any necessary patching or fixes.
+
+	# Needs kreyrenization
+
+	if [ "${A}" != "" ]; then
+		unpack ${A}
+	fi
+}
+
+disabled_src_prepare () {
+# Prepare source packages and do any necessary patching or fixes.
+
+	if declare -p PATCHES | grep -q "^declare -a "; then
+        [[ -n ${PATCHES[@]} ]] && eapply "${PATCHES[@]}"
+    else
+        [[ -n ${PATCHES} ]] && eapply ${PATCHES}
+    fi
+    eapply_user
+}
+
+disabled_src_configure () {
+# Configure the package.
+
+	if [[ -x ${ECONF_SOURCE:-.}/configure ]] ; then
+		econf
+	fi
+}
+
+src_compile () {
+# Configure and build the package.
+
+## TODO: FAILING https://paste.pound-python.org/show/yAG661zxay1qrHJGB40x/
+
+		if [[ -x $(command -v mvn) && -r $PWD/$MPFN/pom.xml ]]; then
+			cd $PWD/$MPFN && mvn clean package --quiet || die "
+!!! FATAL: Maven compilation failed.
+!!! Try invoking 'emerge --sync' and re-emerge the package.
+
+>>> If that didn't work file an issue to upstream on $LINK_ON_REPOSITORY with:
+$([ ! -x $(command -v mvn) ] && echo '!!! FATAL: Maven is not executable!')$([ -x $(command -v mvn) ] && echo '>>> Maven is executable.')
+$([ ! -r $PWD/$MPFN/pom.xml ] && echo '!!! FATAL: '$PWD/$MPFN/pom.xml' is not readable!')$([ -r $PWD/$MPFN/pom.xml ] && echo '>>> '$PWD/$MPFN/pom.xml' is readable.')
+emerge --info : $(wgetpaste -c 'emerge --info' || echo "!!! Unable to fetch output of emerge --info, please provide it manually.")
+JAVA_HOME     : $JAVA_HOME
+pwd           : '$(pwd)'"
+
+			else
+				 die "
+!!! FATAL: Maven is not executable or $PWD/$PFN/pom.xml is not readable.
+!!! Try invoking 'emerge --sync' and re-emerge the package.
+
+>>> If that didn't work file an issue to upstream on $LINK_ON_REPOSITORY with:
+$([ ! -x $(command -v mvn) ] && echo '!!! FATAL: Maven is not executable!')$([ -x $(command -v mvn) ] && echo '>>> Maven is executable.')
+$([ ! -r $PWD/$MPFN/pom.xml ] && echo '!!! FATAL: "$PWD/$MPFN/pom.xml" is not readable!')$([ -r $PWD/$MPFN/pom.xml ] && echo '>>> "$PWD/$MPFN/pom.xml" is readable.')
+emerge --info : $(wgetpaste -c 'emerge --info' || echo "!!! Unable to fetch output of emerge --info, please provide it manually.")
+JAVA_HOME     : $JAVA_HOME
+pwd           : '$(pwd)'"
+
+		fi
+}
+
+disabled_src_test () {
+# Run pre-install test scripts
+
+	if emake check -n &> /dev/null; then
+		emake check
+	elif emake test -n &> /dev/null; then
+		emake test
+	fi
+}
+
+src_install () {
+# Install a package to ${IMAGEDIR} from which it will be extracted to live system
+
+	if [[ -x $(command -v mvn) ]]; then
+
+		cd $PWD/$MPFN || die "Unable to cd in $PWD/$MPFN."
+
+		# TODO: Check if package is compiled.
+		mvn install || die "Maven was unable to install $MPFN, try invoke it manually in $PWD/$PFN/phoenicis-javafx" # TODO: Test if fail triggers die
+
+	fi
+
+	## No need to overengineer src_install since the change of it failing is practically impossible.
+
+}
+
+disabled_pkg_preinstall () {
+# Called before image is installed to ${ROOT}
+
+	enewgroup foo
+	enewuser foo -1 /bin/false /dev/null foo
+}
+
+pkg_postinst () {
+# Called after image is installed to ${ROOT}
+
+	mv $PWD/$PFN/phoenicis-javafx $PID/opt/phoenicis-$MPV || die "Unable to mv $PWD/$PFN/phoenicis-javafx /opt/phoenicis-$MPV."
+
+		if [[ ! -x /usr/bin/phoenicis-$MPV ]]; then
+			echo "#!/bin/bash
+cd /opt/phoenicis && mvn exec:java /opt/phoenicis-$MPV || echo 'Unable to execute phoenicis-$MPV' " >> $PID/usr/bin/phoenicis-$MPV || die "Unable to create a shotcut."
+			chmod +x /usr/bin/phoenicis-$MPV || die "Unable to set executable permission on shortcut in /usr/bin/phoenici-$MPV"
+		fi
+
+}
+
+disabled_pkg_prerm () {
+# Called before a package is unmerged
+
+	return
+}
+
+disabled_pkg_postrm () {
+# Called after image is installed to ${ROOT}
+
+	return
+}
+
+disabled_pkg_config () {
+# Run any special post-install configuration
+
+	eerror "This ebuild does not have a config function."
+	return 
+}
+
+disabled_pkg_info () {
+# display information about a package
+
+	return
+}

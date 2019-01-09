@@ -1,15 +1,20 @@
 # KREYREN!! 
 
-Krey's Garbage Overlay Full Of Wierd Enoch Builds 
+Krey's Garbage Overlay Full Of Wierd Slow Learning Fake Enoch Builds, that should be banned everywhere
 
 *They kept me in the dark, but i know they all.. emerge..* </br>
-*They kept me in the dark and so it all.. BEGAN..!* </br>
+*They kept me in the dark and so it all.. began..!* </br>
 
 *Send your contribs in.. Sing as their merges go marching in.. again..* </br>
-*They need me buried deep.. The secrets that i keep are all at all at ready... Arree youuu reeeadyy?!* </br>
-*I'm finished making sence!!.. Done pleading ignorance!.. That whole.. offense...* </br>
+*They need me buried deep.. The secrets that i keep are all at all at ready... Are you readyy?!* </br>
+*I'm finished making sence!!.. Done pleading ignorance!.. That whole.. offence...* </br>
 
-*WHAT IF I SAY I'M NOT LIKE THE OTHERS?!! WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR PLAYS? I'M THE MAINTAINER!! WHAT IF I SAY I WILL NEVER SURENDER?!!* </br>
+*You are a flaming troll,*
+*The Missbehaving shit,*
+*It's never-ending, never-ending*
+*Same old story..*
+
+*WHAT IF I SAY I'M NOT LIKE THE OTHERS?!! WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR DEVS? I'M THE SUPPORTER!! WHAT IF I SAY I WILL NEVER SURENDER?!!* </br>
 
 ### INSTALLATION (WIP)
 ```

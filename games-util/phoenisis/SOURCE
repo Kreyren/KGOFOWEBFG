@@ -52,7 +52,7 @@
 EAPI=6
 ## java-vm-2 doesn't support EAPI=7
 
-inherit java-vm-2
+inherit java-vm-2 jazzhands 
 
 LINK_ON_REPOSITORY="github.com/Kreyren/KGOFOWEBFG"
 
@@ -166,70 +166,6 @@ PDEPEND="" # Use this only when RDEPEND would cause cyclic dependencies.
 PROPERTIES="interactive"
 
 S=${WORKDIR}
-
-JAZZHANDS () {
-# JAZZHANDS, Krey's version of gentoo's shorthand that MAKES SENCE
-## https://devmanual.gentoo.org/ebuild-writing/variables/
-
-# Package Full Name (Package, Version, Revision (if any)
-### Relevant: Parameter Expansion expands parameters: "$foo", "$1". You can use it to perform string or array operations: "${file%.mp3}", "${0##*/}", "${files[@]: -4}". They should *always* be quoted. See: http://mywiki.wooledge.org/BashFAQ/073 and "Parameter Expansion" in man bash. Also see http://wiki.bash-hackers.org/syntax/pe.
-PFN=$PN-$MPV-${PR:+-$PR} # Expected $PN-$MPV if $PR=""
-
-# Package Category
-PC=${CATEGORY} 
-
-# Package Name
-PN=$PN
-
-# Package Version
-PV=$PV
-
-# Package Revision
-PR=$PR
-
-## Package Version And Revision
-PVAR=${PVR}
-
-# Package Full Name
-PF=$PFN
-
-# PORTage DIRectory
-PORTDIR=/var/tmp/portage
-	PD=${PORTDIR}
-
-
-# PACKage DIRectory
-PACKDIR=${PORTDIR}/${PC}/${PNAV}
-	PDD=${PACKDIR}
-
-# Package Build Directory
-BUILDDIR=${PACKDIR}/build
-	PBD=${BUILDDIR}
-
-#FILESDIR=${PACKDIR}/files - Causes readonly
-	PFD=${FILESDIR}
-
-#WORKDIR=${PACKDIR}/work - Causes readonly
-	PWD=${WORKDIR}
-
-HOMEDIR=${PACKDIR}/homedir
-	PHD=${HOMEDIR}
-
-DISTDIR=${PACKDIR}/distdir
-	PDD=${DISTDIR}
-
-IMAGEDIR=${PACKDIR}/image
-	PID=${IMAGEDIR}
-
-#SOURCEDIR=${PACKDIR}/${PNAV} - Causes readonly
-	PSD=${SOURCEDIR}
-
-ROOT=/ # I AM ROOT
-
-# Modified Package Full Name
-MPFN=$PN-$MPV
-
-}
 
 # FUNCTIONS - https://devmanual.gentoo.org/ebuild-writing/functions/index.html
 

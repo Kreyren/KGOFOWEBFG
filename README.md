@@ -1,6 +1,11 @@
 # KREYREN!! 
 
 Krey's Garbage Overlay Full Of Wierd Enoch Builds For Gentoo 
+
+### INSTALLATION (WIP)
+```
+layman -o https://github.com/ethus3h/compiz-reloaded-overlay/raw/master/compiz-reloaded.xml -f -a compiz-reloaded
+```
  
 *They kept me in the dark, but i know they all.. emerge..* </br>
 *They kept me in the dark and so it all.. BEGAN..!* </br>

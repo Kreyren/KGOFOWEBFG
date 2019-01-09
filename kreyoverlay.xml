@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
+<repositories xmlns="" version="1.0">
+<repo quality="experimental" status="unofficial">
+   <name>kreyoverlay</name>
+   <description>Krey's Overlay</description>
+   <homepage>https://www.rixotstudio.cz/user/kreyren</homepage>
+   <owner>
+       <email>kreyren@rixotstudio.cz</email>
+       <name>Kreyren</name>
+   </owner>
+   <source type="git"git@github.com:Kreyren/KreyOverlay.git</source>
+   <feed>https://github.com/Kreyren/KreyOverlay/commits/master.atom</feed>
+</repo>
+</repositories>

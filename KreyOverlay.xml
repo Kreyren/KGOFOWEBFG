@@ -2,7 +2,7 @@
 <!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
 <repositories xmlns="" version="1.0">
 <repo quality="experimental" status="unofficial">
-   <name>kreyoverlay</name>
+   <name>KreyOverlay</name>
    <description>Krey's Overlay</description>
    <homepage>https://www.rixotstudio.cz/user/kreyren</homepage>
    <owner>

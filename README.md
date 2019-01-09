@@ -1,6 +1,6 @@
 # KREYREN!! 
 
-Krey's Garbage Overlay Full Of Wierd Enoch Builds For Gentoo 
+Krey's Garbage Overlay Full Of Wierd Enoch Builds 
 
 ### INSTALLATION (WIP)
 ```

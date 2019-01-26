@@ -24,3 +24,6 @@ https://drive.google.com/drive/folders/1s2eRQIEckhSBZSgFAkqt3oCtK5Ut_AS5 </br>
 layman -o https://github.com/Kreyren/KreyOverlay/raw/master/KreyOverlay.xml -f -a KreyOverlay
 ```
 
+### Kreyren's codex
+
+You are expected to follow https://wiki.gentoo.org/wiki/User:Kreyren#Kreyren.27s_Codex

@@ -12,12 +12,14 @@ STATUS: work in progress
 https://drive.google.com/drive/folders/1s2eRQIEckhSBZSgFAkqt3oCtK5Ut_AS5 </br>
 *I'm finished making sence!!.. Done pleading ignorance!.. That whole.. offence...* </br>
 
-*You are a flaming troll,*
-*The Missbehaving shit,*
-*It's never-ending, never-ending*
-*Same old story..*
+*You are a flaming troll,* </br>
+*The Missbehaving shit,* </br>
+*It's never-ending, never-ending* </br>
+*Same old story..* </br>
 
-*WHAT IF I SAY I'M NOT LIKE THE OTHERS?!! WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR DEVS? I'M THE SUPPORTER!! WHAT IF I SAY I WILL NEVER SURENDER?!!* </br>
+*WHAT IF I SAY I'M NOT LIKE THE OTHERS?!!* </br>
+*WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR DEVS?* </br>
+*I'M THE SUPPORTER!! WHAT IF I SAY I WILL NEVER SURENDER?!!* </br>
 
 ### INSTALLATION (WIP)
 ```

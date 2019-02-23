@@ -23,6 +23,13 @@ https://drive.google.com/drive/folders/1s2eRQIEckhSBZSgFAkqt3oCtK5Ut_AS5 </br>
 *WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR DEVS?* </br>
 *I'M THE SUPPORTER!! WHAT IF I SAY I WILL NEVER SURENDER?!!* </br>
 
+*In time or so i'm told..* </br>
+*I'm just another soul for merge.. oh, well..* </br>
+*The pages are out of print* </br>
+*Nothing is permanent!* </br>
+*We are temporary.. temporary..* </br>
+*Same old story..* </br>
+
 ### INSTALLATION (WIP)
 ```
 layman -o https://github.com/Kreyren/KreyOverlay/raw/master/KreyOverlay.xml -f -a KreyOverlay

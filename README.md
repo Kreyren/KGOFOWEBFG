@@ -34,11 +34,6 @@ https://drive.google.com/drive/folders/1s2eRQIEckhSBZSgFAkqt3oCtK5Ut_AS5 </br>
 *WHAT IF I SAY I'M NOT JUST ANOTHER ONE OF YOUR DEVS?* </br>
 *I'M THE SUPPORTER!! WHAT IF I SAY I WILL NEVER SURENDER?!!* </br>
 
-*I'm the voice inside your head* </br>
-*You refuse to hear..* </br>
-*I'm the face that you have to face* </br>
-*Mirrored in your stare..* </br>
-*I'm what's left, I'm what's right* </br>
 *Of course i'm the enemy!* </br>
 
 ### INSTALLATION (WIP)

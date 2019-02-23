@@ -6,11 +6,11 @@ STATUS: work in progress
 
 ---
 
-*They kept me in the lies, but i know they all.. emerge..* </br>
+*They kept me in the lies, but you know they all.. emerge..* </br>
 *They kept me in the lies and so it all.. began..!* </br>
 
 *Send your contribs in.. Sing as their merges go marching in.. again..* </br>
-*They need me buried deep.. The secrets that i keep are all at all at ready... Are you readyy?!* </br>
+*They need me banned deep.. The secrets that i keep are all at all at ready... Are you readyy?!* </br>
 https://drive.google.com/drive/folders/1s2eRQIEckhSBZSgFAkqt3oCtK5Ut_AS5 </br>
 *I'm finished making sence!!.. Done pleading ignorance!.. That whole.. offence...* </br>
 

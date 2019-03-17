@@ -43,4 +43,4 @@ layman -o https://github.com/Kreyren/KreyOverlay/raw/master/KreyOverlay.xml -f -
 
 ### Kreyren's codex
 
-You are expected to follow https://wiki.gentoo.org/wiki/User:Kreyren#Kreyren.27s_Codex
+WIP

@@ -9,3 +9,9 @@ Merge requests are not accepted for this ebuild at this moment due it's butterfl
 
 Any suggestion/opinion is welcomed.
 
+
+### Concept 01
+Download source in $HOME/Downloads with dependencies and make bash script to run it.
+
+### Concept 02
+Try using `su -c user` ? Can i grab it somehow?

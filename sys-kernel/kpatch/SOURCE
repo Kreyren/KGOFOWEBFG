@@ -1,0 +1,101 @@
+# Created by Jacob "Kreyren" Hrbek (github.com/kreyren) under GNUv2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+
+EAPI="0"
+# linux-info doesn't support EAPI7
+# EAPI="0" -> because i'm sick and tired of gentoo function calling `use() calls are not allowed in global scope`.
+
+inherit kreyrenized linux-info linux-mod flag-o-matic
+
+DESCRIPTION="Dynamic kernel patching for Linux"
+HOMEPAGE="https://github.com/dynup/kpatch"
+LINK_ON_REPOSITORY="https://github.com/Kreyren/KreyOve rlay"
+
+LICENSE="GPL-2+"
+IUSE="examples +modules test"
+
+UPSTREAM="dynup"
+SOURCE="GitHub"
+
+# COMMITS
+if [[ $EGIT_COMMIT != "" ]]; then
+	[ $PV="0.6.3" ] && EGIT_COMMIT="f4ed9ff76997114ed838a3b964508d721f19f293"
+	[ $PV="0.6.2" ] && EGIT_COMMIT="7305d6c29a45594c44036601e42909b5e5132bdc"
+	[ $PV="0.6.1" ] && EGIT_COMMIT="7f550f01bd308cf058ae782327d29c8916cc5602"
+	[ $PV="0.5.0" ] && EGIT_COMMIT="258ac3f39a14d52d73868d24770b5b6f5786eca2"
+	[ $PV="0.4.0" ] && EGIT_COMMIT="810f9243826219cca9276d364512bb88411aa863"
+	[ $PV="0.3.4" ] && EGIT_COMMIT="4e1a5962dabf08b6aefe2584c28d26fc594e8fb6"
+	[ $PV="0.3.3" ] && EGIT_COMMIT="fa557bd11da59a9a4aea20f3a74125ead2477792"
+	[ $PV="0.3.2" ] && EGIT_COMMIT="706b63ad99cc00c539970961b1950da303cb1f3b"
+	[ $PV="0.3.1" ] && EGIT_COMMIT="b60d3acddb7b96b3b6dd7a4c519189a05b0a4d18"
+	[ $PV="0.3.0" ] && EGIT_COMMIT="f4b5eded0c14ef4f2d6b6d801f1519659e84e217"
+	[ $PV="0.2.2" ] && EGIT_COMMIT="f817265c5adbc11b71f853b804cfacd6ab85db7c"
+	[ $PV="0.2.1" ] && EGIT_COMMIT="0fd7f7f0be4287e95af4d2c69e57865fea63dcb1"
+	[ $PV="0.2.0" ] && EGIT_COMMIT="688a03d8b629287a5ffb501bfa28dd9a3781e10f"
+ [ $PV="0.1.10" ] && EGIT_COMMIT="6ed046f1c2a770099ae984e305fc2260480749f0"
+	[ $PV="0.1.9" ] && EGIT_COMMIT="ce8bb40fc06cc2cd6c4d02199ee3a895bfadb551"
+	[ $PV="0.1.8" ] && EGIT_COMMIT="576ee094420918c6d431d9d97b135046f138e919"
+	[ $PV="0.1.7" ] && EGIT_COMMIT="44ad2ba733063438616ecbf4222da5caebd62a6e"
+	[ $PV="0.1.6" ] && EGIT_COMMIT="92fb49e6f2ec98684b35df6f50976e25fa8eced8"
+	[ $PV="0.1.5" ] && EGIT_COMMIT="f4bba70412801a475eed21087e2dd8cae6b94996"
+	[ $PV="0.1.4" ] && EGIT_COMMIT="3ca8106987bad32dcc60ff9c54d687b92033c0c1"
+	[ $PV="0.1.3" ] && EGIT_COMMIT="a705c223fc6efa87a8d7521c791e9515ad6d981c"
+	[ $PV="0.1.2" ] && EGIT_COMMIT="2601b154d3351b3411043fcff4ccd71fbb039e1d"
+	[ $PV="0.1.1" ] && EGIT_COMMIT="0f3f8ae3369cec5be61c73bf559a8df0c82f9df4"
+	[ $PV="0.1.0" ] && EGIT_COMMIT="135b438af0b9c9d903b01b3386c74add1401dda1"
+fi
+
+RDEPEND="
+	app-crypt/pesign
+	dev-libs/openssl:0=
+	sys-libs/zlib
+	sys-apps/pciutils
+"
+
+DEPEND="
+	${RDEPEND}
+	test? ( dev-util/shellcheck )
+	dev-libs/elfutils
+	sys-devel/bison
+"
+
+pkg_pretend() {
+  if [[ $major -ge 4 && $minnor -ge 19 ]]; then
+		if ! linux_config_exists; then
+			eerror "Unable to check the currently running kernel for kpatch support"
+			eerror "Please be sure a .config file is available in the kernel src dir"
+			eerror "and ensure the kernel has been built."
+		else
+			# Fail to build if these kernel options are not enabled (see kpatch/kmod/core/Makefile)
+			CONFIG_CHECK="FUNCTION_TRACER HAVE_FENTRY MODULES SYSFS KALLSYMS_ALL"
+			ERROR_FUNCTION_TRACER="CONFIG_FUNCTION_TRACER must be enabled in the kernel's config file"
+			ERROR_HAVE_FENTRY="CONFIG_HAVE_FENTRY must be enabled in the kernel's config file"
+			ERROR_MODULES="CONFIG_MODULES must be enabled in the kernel's config file"
+			ERROR_SYSFS="CONFIG_SYSFS must be enabled in the kernel's config file"
+			ERROR_KALLSYMS_ALL="CONFIG_KALLSYMS_ALL must be enabled in the kernel's config file"
+		fi
+	else
+		eerror
+		eerror "kpatch is not available for Linux kernels below 4.0.0"
+		eerror
+		die "Upgrade the kernel sources before installing kpatch."
+	fi
+
+	check_extra_config
+}
+
+src_prepare() {
+	replace-flags '-O?' '-O1'
+	default
+}
+
+src_compile() {
+	set_arch_to_kernel
+	emake all
+}
+
+src_install() {
+	set_arch_to_kernel
+	emake DESTDIR="${D}" PREFIX="/usr" install
+
+	einstalldocs
+}

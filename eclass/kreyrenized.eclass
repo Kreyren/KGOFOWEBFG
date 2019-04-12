@@ -8,7 +8,51 @@
 # @AUTHOR: Jacob Hrbek <kreyren@rixotstudio.cz>
 # @BLURB: Improved variable definitions for enoch builds
 # @REASON: Is supperior and gentoo won't provide expected support -> BECAME THE SUPPORT!
-# @ABSTRACT: NO FATAL ERRORS ARE ACCEPTED! FULL FREEDOM!
+# @ABSTRACT: NO FATAL ERRORS ARE ACCEPTED! FULL FREEDOM! ALL SOURCES!
+
+# AUTOMIZATION
+PUS=${UPSTREAM} # Package UpStream
+LINK_ON_REPOSITORY="github.com/Kreyren/KreyOverlay"
+
+# Exclude variables from an ebuild
+if [[ SRC_URI != "" ]]; then
+	warn "Variable SRC_URI is set automatically using eclass!"
+	unset SRC_URI
+elif [[ KEYWORDS != "" ]]; then
+	warn "Variable KEYWORDS is set automatically using eclass!"
+	unset KEYWORDS
+fi
+
+# Greb correct source automatically
+if [[ SOURCE == @(GitHub|github) ]]; then
+
+	if [[ use gitted ]] || [[ $PV == "9999" ]]; then
+		inherit git-r3
+		EGIT_REPO_URI="git@github.com:${PUS}/${PN}.git"
+
+		if [[ $PV == 9999 ]]; then
+			EGIT_BRANCH="master"
+		fi
+
+		else
+			SRC_URI="https://github.com/${PUS}/${PN}/archive/v${PV}.tar.gz"
+
+			if [[ $PV =~ _(TEST) ]]; then
+				KEYWORDS="~amd64 ~x86"
+
+				else
+					KEYWORDS="amd64 x86"
+			fi
+
+	fi
+
+	MPV=${PV}
+	SLOT="${MPV}" # Sane?
+
+	else
+		die "This SOURCE variable is not supported, file issue on $LINK_ON_REPOSITORY if you want it to be added."
+
+fi
 
 # @FUNCTION: jazzhands
 # @DESCRIPTION: Improve Gentoo's shorthands
@@ -61,7 +105,8 @@ jazzhands() {
 }; jazzhands
 
 # @NAME: Handling of errors
-eerror() { echo "$0:" "$@" >&2 }
+eerror() { echo "$0:" "$@" >&2 } # temporary
+warn() { echo "WARNING: $*" 1>&2 }
 die() {	echo "FATAL: $*" 1>&2 ; exit 1 }
 
 # $FUNCTION: kernel_check

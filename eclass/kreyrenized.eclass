@@ -11,39 +11,41 @@
 # @ABSTRACT: NO FATAL ERRORS ARE ACCEPTED! FULL FREEDOM! ALL SOURCES!
 
 # AUTOMIZATION
-PUS=${UPSTREAM} # Package UpStream
-LINK_ON_REPOSITORY="github.com/Kreyren/KreyOverlay"
+AUTOMATIZATION() {}
+	PUS=${UPSTREAM} # Package UpStream
+	LINK_ON_REPOSITORY="github.com/Kreyren/KreyOverlay"
 
-# Greb correct source automatically
-if [[ SOURCE == @(GitHub|github) ]]; then
+	# Greb correct source automatically
+	if [[ SOURCE == "GitHub" ]]; then
 
-	if [[ use gitted ]] || [[ $PV == "9999" ]]; then
-		inherit git-r3
-		EGIT_REPO_URI="git@github.com:${PUS}/${PN}.git"
+		if use gitted || $PV="9999"; then
+			inherit git-r3
+			EGIT_REPO_URI="git@github.com:${PUS}/${PN}.git"
 
-		if [[ $PV == 9999 ]]; then
-			EGIT_BRANCH="master"
+			if [[ $PV == 9999 ]]; then
+				EGIT_BRANCH="master"
+			fi
+
+			else
+				SRC_URI="https://github.com/${PUS}/${PN}/archive/v${PV}.tar.gz"
+
+				if [[ $PV =~ _(TEST) ]]; then
+					KEYWORDS="~amd64 ~x86"
+
+					else
+						KEYWORDS="amd64 x86"
+				fi
+
+			MPV=${PV}
+			SLOT="${MPV}" # Sane?
+
 		fi
 
 		else
-			SRC_URI="https://github.com/${PUS}/${PN}/archive/v${PV}.tar.gz"
-
-			if [[ $PV =~ _(TEST) ]]; then
-				KEYWORDS="~amd64 ~x86"
-
-				else
-					KEYWORDS="amd64 x86"
-			fi
+			die "This SOURCE variable is not supported, file issue on $LINK_ON_REPOSITORY if you want it to be added."
 
 	fi
-
-	MPV=${PV}
-	SLOT="${MPV}" # Sane?
-
-	else
-		die "This SOURCE variable is not supported, file issue on $LINK_ON_REPOSITORY if you want it to be added."
-
-fi
+}; AUTOMATIZATION
 
 # @FUNCTION: jazzhands
 # @DESCRIPTION: Improve Gentoo's shorthands

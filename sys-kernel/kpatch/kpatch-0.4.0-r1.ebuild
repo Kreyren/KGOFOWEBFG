@@ -2,6 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
+# Why not EAPI7?
 
 inherit linux-info linux-mod flag-o-matic
 
@@ -25,7 +26,7 @@ if [[ $PV == "9999" ]]; then
 		KEYWORDS="~amd64 ~x86"
 
 	# For versioning {0.}0.0-rc0 -- OR -- {0.}0.0
-	elif [[ $PV == @([0-9].[0-9].[0-9]]|[0-9].[0-9].[0-9]]-rc[0-9]) ]]; then
+	elif [[ $PV == @([0-9].[0-9].[0-9]|[0-9].[0-9].[0-9]]-rc[0-9]) ]]; then
 				SRC_URI="https://github.com/${UPSTREAM}/${PN}/archive/v${PV}.tar.gz"
 				KEYWORDS="amd64 x86"
 				MPV=${PV}

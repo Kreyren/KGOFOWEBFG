@@ -14,15 +14,6 @@
 PUS=${UPSTREAM} # Package UpStream
 LINK_ON_REPOSITORY="github.com/Kreyren/KreyOverlay"
 
-# Exclude variables from an ebuild
-if [[ SRC_URI != "" ]]; then
-	warn "Variable SRC_URI is set automatically using eclass!"
-	unset SRC_URI
-elif [[ KEYWORDS != "" ]]; then
-	warn "Variable KEYWORDS is set automatically using eclass!"
-	unset KEYWORDS
-fi
-
 # Greb correct source automatically
 if [[ SOURCE == @(GitHub|github) ]]; then
 

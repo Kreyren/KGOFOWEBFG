@@ -2,7 +2,7 @@
 # Distributed under the terms of the Krey's Anti-Harrasment Licence based on GNU GENERAL PUBLIC LICENSE v2
 # Based on master index https://devmanual.gentoo.org/
 
-# @ECLASS: jazzhands.eclass
+# @ECLASS: kreyrenized.eclass
 # @MAINTAINER: Jacob Hrbek <kreyren@rixotstudio.cz>
 # @SUPPORTED_EAPIS: 0
 # @AUTHOR: Jacob Hrbek <kreyren@rixotstudio.cz>

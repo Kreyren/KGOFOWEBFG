@@ -2,10 +2,11 @@
 # Distributed under the terms of the GNU General Public License v2
 ## BREAKS GENTOO GUIDELINES!! USE WITH CARE!!
 
-EAPI="6"
+EAPI="0"
 # linux-info doesn't support EAPI7
+# EAPI="0" -> because i'm sick and tired of gentoo function calling `use() calls are not allowed in global scope`.
 
-inherit linux-info linux-mod flag-o-matic
+inherit linux-info linux-mod flag-o-matic jazzhands
 
 echo "INFO: This ebuild is KREYRENIZED."
 
@@ -39,10 +40,7 @@ if [[ $PV == "9999" ]]; then
 	# For versioning 0.0.0 || 0.0.0-rc0
 	elif [[ $PV == @([0-9].[0-9].[0-9]|[0-9].[0-9].[0-9]]-rc[0-9]) ]]; then
 				# SANITY: if Linux-<=4.19 is used on 0.6.2 and lower ; else force compatible version.
-				# version=$(uname -r); major=${version%%.*}; minor=${version#*.}; minor=${minor%%.*}
-				# if (( major > 4 || (major == 4 && minor > 19) )); then
-				# if [[ $major -ge 4 && $minnor -ge 19 && ${PV//._} -ge "063" ]]; then
-				if [[ kernel_is -ge "4 19" && ${PV//.-rc} -ge "463*" && $KREYRENIZED != "" ]]; then
+				if [[ $major -ge 4 && $minor -ge 19 && ${PV//.-rc} -ge "063*" && KREYRENIZED != "" ]]; then # SANITY: is ${PV//.-rc} sane?
 					echo "ERROR: Blocked by bug https://github.com/dynup/kpatch/issues/948"
 					echo "KREYRENIZED: Ebuild forced >=sys-kernel/kpatch-0.6.3 for compatibility to avoid FATAL error which is not an option."
 					RDEPEND=">=sys-kernel/kpatch-0.6.3"
@@ -59,9 +57,9 @@ if [[ $PV == "9999" ]]; then
 		return
 
 	else
-		die "This file version is not supported for ${P}, please issue an issue on $LINK_ON_REPOSITORY with:
+		die "This file version is not supported for ${PFN}, please issue an issue on $LINK_ON_REPOSITORY with:
 Unsupported file version
-- FPN : ${P}"
+- FPN : ${FPN}"
 
 fi
 
@@ -80,7 +78,7 @@ DEPEND="
 "
 
 pkg_pretend() {
-	if kernel_is gt 3 9 0; then
+  if [[ $major -ge 4 && $minnor -ge 19 ]]; then
 		if ! linux_config_exists; then
 			eerror "Unable to check the currently running kernel for kpatch support"
 			eerror "Please be sure a .config file is available in the kernel src dir"

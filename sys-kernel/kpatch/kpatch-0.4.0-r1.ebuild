@@ -40,8 +40,9 @@ if [[ $PV == "9999" ]]; then
 				if [[ kernel_is -le 4 19 && ${PV//.} -ge "063" ]]; then
 					echo "FATAL: Blocked by bug https://github.com/dynup/kpatch/issues/948
 -- kpatch-0.6.2 does NOT support Linux Kernel 4.19 and higger due Linux commit 7290d5809571 (https://github.com/dynup/kpatch/commit/da3eed612df1d26e19b0678763e116f666da13b2)."
-					die "INFO: Ebuild forced >=sys-kernel/kpatch-0.6.3 for compatibility to avoid FATAL error, that kreyren hates in it's code."
+					echo "INFO: Ebuild forced >=sys-kernel/kpatch-0.6.3 for compatibility to avoid FATAL error, that kreyren hates in it's code."
 					DEPEND=">=sys-kernel/kpatch-0.6.3"
+					die "INFO: killed due workaround."
 				fi
 
 				# If sanity is passed, download source

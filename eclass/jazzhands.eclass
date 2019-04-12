@@ -70,7 +70,8 @@ kernel_check() {
 	if [[ $(uname -o) == "GNU/Linux" ]]; then
 		version=$(uname -r); major=${version%%.*}; minor=${version#*.}; minor=${minor%%.*} # Export variables
 
-	else ; echo "FATAL: This kernel is not supported by jazzhands.eclass, file an issue to github.com/Kreyren/KreyOverlay with:
+	else
+		 echo "FATAL: This kernel is not supported by jazzhands.eclass, file an issue to github.com/Kreyren/KreyOverlay with:
 
 - uname -a == ${uname -a}
 - uname -s == ${uname -s}

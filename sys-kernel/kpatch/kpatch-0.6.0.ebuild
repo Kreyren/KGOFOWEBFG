@@ -102,7 +102,7 @@ if [[ $PV == "9999" ]]; then
 				# version=$(uname -r); major=${version%%.*}; minor=${version#*.}; minor=${minor%%.*}
 				# if (( major > 4 || (major == 4 && minor > 19) )); then
 				# if [[ $major -ge 4 && $minnor -ge 19 && ${PV//._} -ge "063" ]]; then
-				if [[ kernel_is -ge "4 9" && ${PV} -ge "463*" || KREYRENIZED != "" ]]; then
+				kernel_is ge 4 19 && if [[ ${PV//.-rc} -ge "463*" || KREYRENIZED != "" ]]; then
 					echo "ERROR: Blocked by bug https://github.com/dynup/kpatch/issues/948"
 					echo "INFO: Ebuild forced >=sys-kernel/kpatch-0.6.3 for compatibility to avoid FATAL error which is not an option."
 					echo "If you want to skip this error use KREYRENIZED variable with any value (in make.conf)"

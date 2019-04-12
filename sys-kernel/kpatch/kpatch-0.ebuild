@@ -7,6 +7,8 @@ EAPI="6"
 
 inherit linux-info linux-mod flag-o-matic
 
+PROPERTIES="interactive"
+
 DESCRIPTION="Dynamic kernel patching for Linux"
 HOMEPAGE="https://github.com/dynup/kpatch"
 LINK_ON_REPOSITORY="https://github.com/Kreyren/KreyOverlay"
@@ -15,6 +17,64 @@ LICENSE="GPL-2+"
 IUSE="examples +modules test"
 
 UPSTREAM="dynup"
+
+workaround_to_error () {
+	RDEPEND="
+		app-crypt/pesign
+		dev-libs/openssl:0=
+		sys-libs/zlib
+		sys-apps/pciutils
+	"
+
+	DEPEND="
+		${RDEPEND}
+		test? ( dev-util/shellcheck )
+		dev-libs/elfutils
+		sys-devel/bison
+	"
+
+	pkg_pretend() {
+		if kernel_is gt 3 9 0; then
+			if ! linux_config_exists; then
+				eerror "Unable to check the currently running kernel for kpatch support"
+				eerror "Please be sure a .config file is available in the kernel src dir"
+				eerror "and ensure the kernel has been built."
+			else
+				# Fail to build if these kernel options are not enabled (see kpatch/kmod/core/Makefile)
+				CONFIG_CHECK="FUNCTION_TRACER HAVE_FENTRY MODULES SYSFS KALLSYMS_ALL"
+				ERROR_FUNCTION_TRACER="CONFIG_FUNCTION_TRACER must be enabled in the kernel's config file"
+				ERROR_HAVE_FENTRY="CONFIG_HAVE_FENTRY must be enabled in the kernel's config file"
+				ERROR_MODULES="CONFIG_MODULES must be enabled in the kernel's config file"
+				ERROR_SYSFS="CONFIG_SYSFS must be enabled in the kernel's config file"
+				ERROR_KALLSYMS_ALL="CONFIG_KALLSYMS_ALL must be enabled in the kernel's config file"
+			fi
+		else
+			eerror
+			eerror "kpatch is not available for Linux kernels below 4.0.0"
+			eerror
+			die "Upgrade the kernel sources before installing kpatch."
+		fi
+
+		check_extra_config
+	}
+
+	src_prepare() {
+		replace-flags '-O?' '-O1'
+		default
+	}
+
+	src_compile() {
+		set_arch_to_kernel
+		emake all
+	}
+
+	src_install() {
+		set_arch_to_kernel
+		emake DESTDIR="${D}" PREFIX="/usr" install
+
+		einstalldocs
+	}
+}
 
 ## Get keywords, version, source and slot
 # For live build
@@ -34,62 +94,7 @@ if [[ $PV == "9999" ]]; then
 		EGIT_REPO_URI="https://github.com/${UPSTREAM}/${PN}.git"
 		EGIT_COMMIT="da3eed612df1d26e19b0678763e116f666da13b2"
 		KEYWORDS="~amd64 ~x86"
-
-    RDEPEND="
-  		app-crypt/pesign
-  		dev-libs/openssl:0=
-  		sys-libs/zlib
-  		sys-apps/pciutils
-  	"
-
-  	DEPEND="
-  		${RDEPEND}
-  		test? ( dev-util/shellcheck )
-  		dev-libs/elfutils
-  		sys-devel/bison
-  	"
-
-  	pkg_pretend() {
-  		if kernel_is gt 3 9 0; then
-  			if ! linux_config_exists; then
-  				eerror "Unable to check the currently running kernel for kpatch support"
-  				eerror "Please be sure a .config file is available in the kernel src dir"
-  				eerror "and ensure the kernel has been built."
-  			else
-  				# Fail to build if these kernel options are not enabled (see kpatch/kmod/core/Makefile)
-  				CONFIG_CHECK="FUNCTION_TRACER HAVE_FENTRY MODULES SYSFS KALLSYMS_ALL"
-  				ERROR_FUNCTION_TRACER="CONFIG_FUNCTION_TRACER must be enabled in the kernel's config file"
-  				ERROR_HAVE_FENTRY="CONFIG_HAVE_FENTRY must be enabled in the kernel's config file"
-  				ERROR_MODULES="CONFIG_MODULES must be enabled in the kernel's config file"
-  				ERROR_SYSFS="CONFIG_SYSFS must be enabled in the kernel's config file"
-  				ERROR_KALLSYMS_ALL="CONFIG_KALLSYMS_ALL must be enabled in the kernel's config file"
-  			fi
-  		else
-  			eerror
-  			eerror "kpatch is not available for Linux kernels below 4.0.0"
-  			eerror
-  			die "Upgrade the kernel sources before installing kpatch."
-  		fi
-
-  		check_extra_config
-  	}
-
-  	src_prepare() {
-  		replace-flags '-O?' '-O1'
-  		default
-  	}
-
-  	src_compile() {
-  		set_arch_to_kernel
-  		emake all
-  	}
-
-  	src_install() {
-  		set_arch_to_kernel
-  		emake DESTDIR="${D}" PREFIX="/usr" install
-
-  		einstalldocs
-  	}
+		workaround_to_error
 
 	# For versioning 0.0.0 || 0.0.0-rc0
 	elif [[ $PV == @([0-9].[0-9].[0-9]|[0-9].[0-9].[0-9]]-rc[0-9]) ]]; then
@@ -97,7 +102,7 @@ if [[ $PV == "9999" ]]; then
 				# version=$(uname -r); major=${version%%.*}; minor=${version#*.}; minor=${minor%%.*}
 				# if (( major > 4 || (major == 4 && minor > 19) )); then
 				# if [[ $major -ge 4 && $minnor -ge 19 && ${PV//._} -ge "063" ]]; then
-				kernel_is ge 4 19 && if [[ ${PV} -ge "463*" || KREYRENIZED != "" ]]; then
+				kernel_is ge 4 19 && if [[ ${PV//.-rc} -ge "463*" || KREYRENIZED != "" ]]; then
 					echo "ERROR: Blocked by bug https://github.com/dynup/kpatch/issues/948"
 					echo "INFO: Ebuild forced >=sys-kernel/kpatch-0.6.3 for compatibility to avoid FATAL error which is not an option."
 					echo "If you want to skip this error use KREYRENIZED variable with any value (in make.conf)"
@@ -108,62 +113,7 @@ if [[ $PV == "9999" ]]; then
 						KEYWORDS="amd64 x86"
 						MPV=${PV}
 						SLOT="${MPV}"
-
-            RDEPEND="
-          		app-crypt/pesign
-          		dev-libs/openssl:0=
-          		sys-libs/zlib
-          		sys-apps/pciutils
-          	"
-
-          	DEPEND="
-          		${RDEPEND}
-          		test? ( dev-util/shellcheck )
-          		dev-libs/elfutils
-          		sys-devel/bison
-          	"
-
-          	pkg_pretend() {
-          		if kernel_is gt 3 9 0; then
-          			if ! linux_config_exists; then
-          				eerror "Unable to check the currently running kernel for kpatch support"
-          				eerror "Please be sure a .config file is available in the kernel src dir"
-          				eerror "and ensure the kernel has been built."
-          			else
-          				# Fail to build if these kernel options are not enabled (see kpatch/kmod/core/Makefile)
-          				CONFIG_CHECK="FUNCTION_TRACER HAVE_FENTRY MODULES SYSFS KALLSYMS_ALL"
-          				ERROR_FUNCTION_TRACER="CONFIG_FUNCTION_TRACER must be enabled in the kernel's config file"
-          				ERROR_HAVE_FENTRY="CONFIG_HAVE_FENTRY must be enabled in the kernel's config file"
-          				ERROR_MODULES="CONFIG_MODULES must be enabled in the kernel's config file"
-          				ERROR_SYSFS="CONFIG_SYSFS must be enabled in the kernel's config file"
-          				ERROR_KALLSYMS_ALL="CONFIG_KALLSYMS_ALL must be enabled in the kernel's config file"
-          			fi
-          		else
-          			eerror
-          			eerror "kpatch is not available for Linux kernels below 4.0.0"
-          			eerror
-          			die "Upgrade the kernel sources before installing kpatch."
-          		fi
-
-          		check_extra_config
-          	}
-
-          	src_prepare() {
-          		replace-flags '-O?' '-O1'
-          		default
-          	}
-
-          	src_compile() {
-          		set_arch_to_kernel
-          		emake all
-          	}
-
-          	src_install() {
-          		set_arch_to_kernel
-          		emake DESTDIR="${D}" PREFIX="/usr" install
-
-          		einstalldocs
-          	}
+						workaround_to_error
 
 				fi
 

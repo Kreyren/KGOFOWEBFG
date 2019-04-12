@@ -2,28 +2,47 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
+# Why not EAPI7?
 
 inherit linux-info linux-mod flag-o-matic
 
-if [[ "${PV}" == "9999" ]]; then
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/dynup/${PN}.git"
+UPSTREAM="dynup"
 
-	elif [[ "${PV}" == "0.6.3" ]]; then
+## Get keywords, version, source and slot
+# For live build
+if [[ $PV == "9999" ]]; then
+	inherit git-r3
+	EGIT_REPO_URI="git@github.com:${UPSTREAM}/${PN}}.git"
+	EGIT_BRANCH="master"
+	MPV=${PV}
+	SLOT="${MPV}"
+	unset SRC_URI
+	unset KEYWORDS
+
+	elif [[ $PV == "0.6.3" ]]; then
 		inherit git-r3
-		EGIT_REPO_URI="https://github.com/dynup/${PN}.git"
+		EGIT_REPO_URI="https://github.com/${UPSTREAM}/${PN}.git"
 		EGIT_COMMIT="da3eed612df1d26e19b0678763e116f666da13b2"
-	
+		KEYWORDS="~amd64 ~x86"
+
+	# For versioning {0.}0.0-rc0 -- OR -- {0.}0.0
+	elif [[ $PV == @([0-9].[0-9].[0-9]]|[0-9].[0-9].[0-9]]-rc[0-9]) ]]; then
+				SRC_URI="https://github.com/${UPSTREAM}/${PN}/archive/v${PV}.tar.gz"
+				KEYWORDS="amd64 x86"
+				MPV=${PV}
+				SLOT="${MPV}"
+
 	else
-		SRC_URI="https://github.com/dynup/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-		KEYWORDS="~amd64"
+		die "This file version is not supported by this ebuild, please issue an issue on $LINK_ON_REPOSITORY with:
+Unsupported file version
+- FPN : ${P}"
+
 fi
 
 DESCRIPTION="Dynamic kernel patching for Linux"
 HOMEPAGE="https://github.com/dynup/kpatch"
 
 LICENSE="GPL-2+"
-SLOT="0"
 IUSE="examples +modules test"
 
 RDEPEND="

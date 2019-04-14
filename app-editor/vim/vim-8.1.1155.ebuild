@@ -82,7 +82,7 @@ src_prepare() {
 		"${S}"/runtime/tools/mve.awk || die "mve.awk sed failed"
 
 	# Read vimrc and gvimrc from /etc/vim
-	echo '#define SYS_VIMRC_FILE "'${EPREFIX}'/home/kreyren/.config/vim/config.vimrc"' \
+	echo '#define SYS_VIMRC_FILE "'${MY_FUCKING_VIMRC}"' \
 		>> "${S}"/src/feature.h || die "echo failed" # BECAUSE I'M LOSING MY FUCKING MIND WITH THIS BULLSHIT
 	echo '#define SYS_GVIMRC_FILE "'${EPREFIX}'/etc/vim/gvimrc"' \
 		>> "${S}"/src/feature.h || die "echo failed"

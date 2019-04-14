@@ -1,4 +1,4 @@
-# KREYREN!! 
+# KREYREN!!
 
 Krey's Garbage Overlay Full Of Wierd Slow Learning Fake Enoch Builds, that should be banned everywhere
 
@@ -43,4 +43,7 @@ layman -o https://github.com/Kreyren/KreyOverlay/raw/master/KreyOverlay.xml -f -
 
 ### Kreyren's codex
 
-WIP
+1) Support everything (GNU Ethics)
+2) No fatal errors.
+3) Do not limit anyone using this overlay.
+4) (No shitty code) - Applies to non-WIP state

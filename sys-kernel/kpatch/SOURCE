@@ -1,8 +1,11 @@
 # Created by Jacob "Kreyren" Hrbek (github.com/kreyren) under GNUv2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
-EAPI="0"
-# linux-info doesn't support EAPI7
-# EAPI="0" -> because i'm sick and tired of gentoo function calling `use() calls are not allowed in global scope`.
+UPSTREAM="dynup"
+SOURCE="GitHub"
+
+## TODO: Add kernel check for 0.6.2 - https://github.com/dynup/kpatch/issues/948
+# Blocked by `use() calls are not allowed in global scope`
+##
 
 inherit kreyrenized linux-info linux-mod flag-o-matic
 
@@ -12,9 +15,6 @@ LINK_ON_REPOSITORY="https://github.com/Kreyren/KreyOve rlay"
 
 LICENSE="GPL-2+"
 IUSE="examples +modules test"
-
-UPSTREAM="dynup"
-SOURCE="GitHub"
 
 # COMMITS
 if [[ $EGIT_COMMIT != "" ]]; then

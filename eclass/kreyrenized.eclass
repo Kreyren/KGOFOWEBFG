@@ -7,8 +7,8 @@
 # @SUPPORTED_EAPIS: 0
 # @AUTHOR: Jacob Hrbek <kreyren@rixotstudio.cz>
 # @BLURB: Improved variable definitions for enoch builds
-# @REASON: Is supperior and gentoo won't provide expected support -> BECAME THE SUPPORT!
-# @ABSTRACT: NO FATAL ERRORS ARE ACCEPTED! FULL FREEDOM! ALL SOURCES!
+
+EAPI="0"
 
 # AUTOMIZATION
 AUTOMATIZATION() {
@@ -16,83 +16,61 @@ AUTOMATIZATION() {
 	LINK_ON_REPOSITORY="github.com/Kreyren/KreyOverlay"
 
 	# Greb correct source automatically
-	if [[ SOURCE == "GitHub" ]]; then
+	if [[ $SOURCE == "GitHub" ]]; then
 
 		if use gitted || $PV="9999"; then
 			inherit git-r3
 			EGIT_REPO_URI="git@github.com:${PUS}/${PN}.git"
 
-			if [[ $PV == 9999 ]]; then
-				EGIT_BRANCH="master"
-			fi
+			[ $PV == 9999 ] && EGIT_BRANCH="master"
 
 			else
 				SRC_URI="https://github.com/${PUS}/${PN}/archive/v${PV}.tar.gz"
 
 				if [[ $PV =~ _(TEST) ]]; then
 					KEYWORDS="~amd64 ~x86"
-
 					else
 						KEYWORDS="amd64 x86"
 				fi
 
 			MPV=${PV}
-			SLOT="${MPV}" # Sane?
+			SLOT="${PV}" # Sane?
 
 		fi
 
 		else
-			die "This SOURCE variable is not supported, file issue on $LINK_ON_REPOSITORY if you want it to be added."
-
+			die "This SOURCE variable is not supported, file issue on $LINK_ON_REPOSITORY with:
+- SOURCE == ${SOURCE}"
 	fi
+
 }; AUTOMATIZATION
 
 # @FUNCTION: jazzhands
 # @DESCRIPTION: Improve Gentoo's shorthands
 jazzhands() {
 	PC="${CATEGORY}" # Package Category
-
 	PN=$PN # Package Name
-
 	PV=$PV # Package Version
-
 	PR=$PR # Package Revision
-
 	PVAR=${PVR} # Package Version And Revision
-
 	PFN=${PN} # Package Full Name
-
 	ROOT="/" # I AM ROOT
-
-	# My/Modified Package Full Name
-	MPFN="$PN-$MPV"
-
+	MPFN="$PN-$MPV" # My/Modified Package Full Name
 	PFN="$PN-$MPV-${PR:+-$PR}" # Package Full Name (Package, Version, Revision (if any)
-	## Expected $PN-$MPV if $PR=""
-	## Relevant: Parameter Expansion expands parameters: "$foo", "$1". You can use it to perform string or array operations: "${file%.mp3}", "${0##*/}", "${files[@]: -4}". They should *always* be quoted. See: http://mywiki.wooledge.org/BashFAQ/073 and "Parameter Expansion" in man bash. Also see http://wiki.bash-hackers.org/syntax/pe.
-
 	PORTDIR="/var/tmp/portage" # PORTage DIRectory
-
 	PACKDIR="${PORTDIR}/${PC}/${PNAV}" # PACKage DIRectory
-
 	BUILDDIR="${PACKDIR}/build" # Package Build Directory
 		PBD=${BUILDDIR}
-
 	FILESDIR="${PACKDIR}/files" # Package Files Directory
 		PFD=${FILESDIR}
-
 	WORKDIR="${PACKDIR}/work" # Package Work Directory
 		PWD=${WORKDIR}
-
 	HOMEDIR="${PACKDIR}/homedir" # Package Home Directory
 		PHD=${HOMEDIR}
-
 	DISTDIR="${PACKDIR}/distdir" # Package Dist Directory
 		PDD=${DISTDIR}
-
 	IMAGEDIR="${PACKDIR}/image" # Package Image Directory
 		PID=${IMAGEDIR}
-
 	SOURCEDIR="${PACKDIR}/${PNAV}" # Package Source Directory
 		PSD=${SOURCEDIR}
 }; jazzhands

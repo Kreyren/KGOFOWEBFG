@@ -1,0 +1,126 @@
+# Copyright 1999-2016 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+## RELEVANT: https://gpo.zugaina.org/www-client/servo-bin
+
+EAPI=6
+
+## INFO
+DESCRIPTION="Servo is an experimental browser engine developed to take advantage of the memory safety properties and concurrency features of the Rust programming language." # Wikipedia contributors, "Servo (software)," Wikipedia, The Free Encyclopedia, https://en.wikipedia.org/w/index.php?title=Servo_(software)&oldid=894831437 (accessed May 5, 2019).
+HOMEPAGE="https://servo.org"
+LICENSE="MPL-2.0" # https://github.com/servo/servo/blob/master/LICENSE
+REPOSITORY="servo"
+  PRP="${REPOSITORY}" # Package RePository
+UPSTREAM="servo"
+	PUS="${UPSTREAM}" # Package UpStream shorthand
+MAINTAINER="github.com/Kreyren/KreyOverlay"
+HOSTED="GitHub"
+IUSE="amd64"
+
+## COMMITS
+declare -A commit_by=(
+  [0.21.0]="d114376a8c163f93724ee24171111ce4b3ed299a"
+  [0.20.0]="4ade6656dcfab532d15da6c03b98cc2f6f7cb471"
+  [0.18.0]="b428a94326322c88da4c32e56ee753ceeffca7d1"
+)
+
+## ACCEPTED_VERSIONS
+declare -A version_by=(
+  [0.21.0-rc1]="${PV}"
+  [0.21.0]="${PV}"
+  [0.20.0]="${PV}"
+  [0.18.0]="${PV}"
+  [9999]="${PV}"
+  [99994]="${PV}"
+)
+
+# VARIABLES
+MPV=${PV}
+SLOT="0"
+S="${WORKDIR}/${P}"
+
+## LOGIC
+if [[ $HOSTED == "GitHub" ]]; then
+
+	if [[ $PV == "9999" ]]; then
+		inherit git-r3
+		echo "INFO: 9999 version is detected"
+		EGIT_BRANCH="master" && echo "INFO: EGIT_BRANCH set on master."
+		unset EGIT_COMMIT && echo "INFO: EGIT_COMMIT was unset."
+
+  elif [[ $PV == "99994" ]]; then
+    inherit eutils
+    SRC_URI=" amd64? ( https://download.servo.org/nightly/linux/servo-latest.tar.gz ) "
+    S="${WORKDIR}/${PN}"
+
+	# else if variable KREY_GIT is NOT blank -- AND -- declaration of "commit_by" matches list above based on $PV; then
+	elif [[ $KREY_GIT != "" ]] && [[ -v "commit_by[${PV}]" ]]; then
+		inherit git-r3
+		EGIT_REPO_URI="git@github.com:${PUS}/${PRP}/${PN}.git"
+		EGIT_COMMIT="${commit_by[${PV}]}"
+
+	# else if variable KREY_GIT is NOT blank -- AND -- declaration of "commit_by" does NOT matches list above based on $PV; then FATAL
+  elif [[ $KREY_GIT != "" ]] && [[ ! -v "commit_by[${PV}]" ]]; then
+		die "FATAL: Declaration of '${commit_by[${PV}]}' is not supported.
+
+If you want it to be added file issue on $MAINTAINER/issues/ with:
+
+### START OF MESSAGE ###
+
+Requesting support for ${HOSTED} on ${PN}.
+
+### END OF MESSAGE ###
+
+Do not add more info unless requested, it's fucking up my bots and forcing me to do work which i don't like."
+
+	# else if variable KREY_GIT is blank -- AND -- variable Package Version is not 9999; then
+	elif [[ $KREY_GIT == "" ]] && [[ $PV != 9999 ]] && [[ -v "version_by[${PV}]" ]]; then
+		SRC_URI="https://github.com/${PUS}/${PRP}/archive/selectors-v${PV}.tar.gz"
+
+	fi
+
+elif [[ $HOSTED != "GitHub" ]]; then
+	die "FATAL: ${HOSTED} which is source variable for logic is not supported.
+
+If you want it to be added file issue on $MAINTAINER/issues/ with:
+
+### START OF MESSAGE ###
+
+Requesting support for ${HOSTED} on ${PN}.
+
+### END OF MESSAGE ###
+
+Do not add more info unless requested, it's fucking up my bots and forcing me to do work which i don't like."
+
+fi
+
+## KEYWORDS
+if [[ $PV == @(0.18.0|0.20.0|0.21.0|9999) ]]; then
+	KEYWORDS="~amd64 ~i686"
+else
+	KEYWORDS="amd64 i686"
+fi
+
+## DEPENDENCIES
+DEPEND=""
+
+RDEPEND="media-libs/gst-plugins-bad"
+## Depends on `libgstgl-1.0.so.0` based on ``/opt/servo/servo: error while loading shared libraries: libgstgl-1.0.so.0: cannot open shared object file: No such file or directory`
+### Probably only required for bin
+
+pkg_pretend() {
+	# Protect against people using autounmask overzealously
+	use amd64 || die "FATAL: binary servo only works on amd64"
+}
+
+src_unpack() {
+    unpack ${A} || die "FATAL: Nothing to unpack."
+}
+
+src_install() {
+  if [[ $PV == "99994" ]]; then
+    insinto /opt || die
+	  doins -r servo || die
+	  make_wrapper servo "/opt/servo/servo" || die
+  fi
+}

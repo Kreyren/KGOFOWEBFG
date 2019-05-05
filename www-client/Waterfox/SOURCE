@@ -1,0 +1,142 @@
+# Created by Jacob "Kreyren" Hrbek <werifgx@gmail.com> (github.com/kreyren) under GNUv2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+# Originaly created by rasdark (https://github.com/rasdark)
+
+EAPI=6
+
+inherit qmake-utils
+
+# ABSTRACT
+## Allow selecting bin and compiling on demand
+### ISSUE: "git" useflag is not supported, because i can't greb it in global scope. -> using KREY_GIT variable
+
+# RELEVANT: https://slackbuilds.org/slackbuilds/14.2/network/waterfox/waterfox.SlackBuild
+# RELEVANT: https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=waterfox-git
+
+## INFO
+DESCRIPTION="Waterfox is an open-source web browser for x64 and ARM64 systems. It is intended to be speedy and ethical, and maintain support for legacy extensions dropped by Firefox, from which it is forked." # Wikipedia contributors, "Waterfox," Wikipedia, The Free Encyclopedia, https://en.wikipedia.org/w/index.php?title=Waterfox&oldid=893199348 (accessed May 5, 2019).
+HOMEPAGE="https://www.waterfoxproject.org/"
+LICENSE="MPL-2.0" # https://github.com/MrAlex94/Waterfox/blob/master/LICENSE'
+MAINTAINER="github.com/Kreyren/KreyOverlay"
+UPSTREAM="MrAlex94"
+	PUS="${UPSTREAM}" # Package UpStream shorthand
+REPOSITORY="Waterfox"
+	PRP="${REPOSITORY}" # Package RePository
+SOURCE="GitHub"
+
+## KEYWORDS
+if [[ $PV == @(56.0.2|56.0.3|56.0.4|56.1.0|56.2.0|56.2.1|56.2.2|56.2.3|56.2.4|56.2.5|56.2.6|56.2.7.0|56.2.7.1|56.2.8) ]]; then
+	KEYWORDS="~amd64 ~i686"
+else
+	KEYWORDS="amd64 i686"
+fi
+
+## TECHNICAL
+RESTRICT="strip mirror"
+IUSE="gitted"
+
+DEPEND="
+	>=sys-devel/gcc-4.9.2
+" # NOT VERIFIED
+
+RDEPEND="
+	>=sys-apps/dbus-0.60
+	>=dev-libs/dbus-glib-0.60
+	media-libs/alsa-lib
+	media-libs/fontconfig
+	>=media-libs/freetype-2.1.0
+	>=x11-libs/gtk+-3.4
+	x11-libs/libX11
+	x11-libs/libXcomposite
+	x11-libs/libXdamage
+	x11-libs/libXext
+	x11-libs/libXfixes
+	x11-libs/libXrender
+	x11-libs/libXt
+	x11-libs/pango
+	virtual/freedesktop-icon-theme
+	virtual/ffmpeg[x264]
+"
+
+## COMMITS
+declare -A commit_by=(
+	[56.2.8]="fa114d424de1ccfc6a8ee5b13cef8b506d0d87eb"
+	[56.2.7.1]="f367fd24ba208519742e7370fb1478c3ed0d14c7"
+	[56.2.7.0]="3fa3c2a1bb8b8e6c30b1ccebe50d5133cd355953"
+	[56.2.6]="ff4597172229f8d71940c3885b74b903b7b1821a"
+	[56.2.5]="04e6373e185278c113d792d7b86670bcf8084599"
+	[56.2.4]="9c2c0e0c5593abb40b6093d9b2a28b294b2b0ce9"
+	[56.2.3]="432b42717b0678a933f9d0731f02f9d1d32bdec2"
+	[56.2.2]="f874dbfaac9344f25e2f363dd3064fbac25d1bbf"
+	[56.2.1]="04c6debaf8d1391ea48b3872019a3aa38a1f211e"
+	[56.2.0]="436898372f8589d4a241e924084119358c58bf45"
+	[56.1.0]="67d2b0ee4c226f7d5c45093bed9b3c3832178b08"
+	[56.0.4]="91065bd7e2d03197254f887da75193ac47bf3c0e"
+	[56.0.3]="e5cadca84043a21749fa48c077d81a8bf1f573e8"
+	[56.0.2]="5404f1c5a5bb8add0abc75f2f0e42d28532f74ed"
+)
+
+## LOGIC
+if [[ $SOURCE == "GitHub" ]]; then
+
+	if [[ $PV == 9999 ]]; then
+		inherit git-r3
+		echo "INFO: 9999 version is detected"
+		EGIT_BRANCH="master" && echo "INFO: EGIT_BRANCH set on master."
+		unset EGIT_COMMIT && echo "INFO: EGIT_COMMIT was unset."
+
+	# else if variable KREY_GIT is NOT blank -- AND -- declaration of "commit_by" matches list above based on $PV; then
+	elif [[ $KREY_GIT != "" ]] && [[ -v "commit_by[${PV}]" ]]; then
+		inherit git-r3
+		EGIT_REPO_URI="git@github.com:${PUS}/${PRP}/${PN}.git"
+		EGIT_COMMIT="${commit_by[${PV}]}"
+
+	# else if variable KREY_GIT is NOT blank -- AND -- declaration of "commit_by" does NOT matches list above based on $PV; then FATAL
+	elif [[ $KREY_GIT != "" ]] && [[ ! -v "commit_by[${PV}]" ]]; then
+		die "FATAL: Declaration of '${commit_by[${PV}]}' is not supported.
+
+If you want it to be added file issue on $MAINTAINER/issues/ with:
+
+### START OF MESSAGE ###
+
+Requesting support for ${SOURCE} on ${PN}.
+
+### END OF MESSAGE ###
+
+Do not add more info unless requested, it's fucking up my bots and forcing me to do work which i don't like."
+
+	# else if variable KREY_GIT is blank -- AND -- variable Package Version is not 9999; then
+	elif [[ $KREY_GIT == "" ]] && [[ $PV != 9999 ]]; then
+		#SRC_URI="amd64? ( https://github.com/${PUS}/${PRP}/archive/v${PV}.tar.gz )"
+		SRC_URI="https://github.com/${UPSTREAM}/${REPOSITORY}/archive/${PV}.tar.gz"
+
+	fi
+
+	# VARIABLES
+	MPV=${PV}
+	SLOT="0"
+
+	else
+	die "FATAL: ${SOURCE} which is source variable for logic is not supported.
+
+If you want it to be added file issue on $MAINTAINER/issues/ with:
+
+### START OF MESSAGE ###
+
+Requesting support for ${SOURCE} on ${PN}.
+
+### END OF MESSAGE ###
+
+Do not add more info unless requested, it's fucking up my bots and forcing me to do work which i don't like."
+
+fi
+
+src_compile() {
+	cd ${S}/build
+	#emake CONFIG+=silent ${S}/build # To make output readable
+	## `/usr/bin/gmake -f client.mk MOZ_PARALLEL_BUILD=12 -s configure` is executed in tarbar by default
+	make
+}
+
+src_install() {
+	emake INSTALL_ROOT="${D}" install
+}
